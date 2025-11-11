@@ -1,7 +1,6 @@
 """File collection with pattern matching."""
 import hashlib
 from pathlib import Path, PurePath
-import fnmatch
 
 from claude_lint.config import Config
 
@@ -19,11 +18,19 @@ def collect_all_files(root_path: Path, config: Config) -> list[Path]:
     all_files = []
 
     for pattern in config.include:
-        # Use rglob for recursive patterns
+        # Use rglob for ** patterns, glob otherwise
         if "**" in pattern:
-            # Extract the extension pattern (e.g., "*.py" from "**/*.py")
-            glob_pattern = pattern.split("**/")[-1]
-            matching = root_path.rglob(glob_pattern)
+            # For ** patterns, extract the file pattern
+            # e.g., "**/*.py" -> "*.py", "src/**/*.py" -> walk and match
+            parts = pattern.split("/")
+            if pattern.startswith("**/"):
+                # Simple case: **/*.ext
+                glob_pattern = "/".join(parts[1:])
+                matching = root_path.rglob(glob_pattern)
+            else:
+                # Complex case: use rglob with ** and filter
+                glob_pattern = "/".join(parts)
+                matching = root_path.glob(glob_pattern)
         else:
             matching = root_path.glob(pattern)
 
@@ -97,6 +104,9 @@ def compute_file_hash(file_path: Path) -> str:
 def is_excluded(relative_path: Path, exclude_patterns: list[str]) -> bool:
     """Check if file is excluded by patterns.
 
+    Uses pathlib.PurePath.match() for consistent glob-style matching
+    with include patterns. Supports ** for recursive matching.
+
     Args:
         relative_path: File path relative to root
         exclude_patterns: List of exclude patterns
@@ -104,7 +114,36 @@ def is_excluded(relative_path: Path, exclude_patterns: list[str]) -> bool:
     Returns:
         True if file should be excluded
     """
-    return any(
-        fnmatch.fnmatch(str(relative_path), pattern)
-        for pattern in exclude_patterns
-    )
+    path_obj = PurePath(relative_path)
+
+    for pattern in exclude_patterns:
+        # PurePath.match() handles ** for nested paths, but we need to handle
+        # different pattern forms specially
+
+        # First try direct match
+        if path_obj.match(pattern):
+            return True
+
+        # Handle patterns like "**/tests/**" - check if any part of path matches
+        if "**" in pattern:
+            # For patterns like "**/dirname/**", check if dirname is in path parts
+            if pattern.startswith("**/") and pattern.endswith("/**"):
+                dir_name = pattern[3:-3]  # Extract "dirname" from "**/dirname/**"
+                if dir_name in path_obj.parts:
+                    return True
+
+            # For patterns like "dirname/**", check if path starts with dirname
+            elif pattern.endswith("/**") and not pattern.startswith("**/"):
+                prefix = pattern[:-3]  # Remove "/**"
+                # Check if any parent of path matches the prefix
+                for parent in [path_obj] + list(path_obj.parents):
+                    if parent.match(prefix) or str(parent) == prefix:
+                        return True
+
+            # For patterns like "**/filename.ext", check against path
+            elif pattern.startswith("**/"):
+                suffix_pattern = pattern[3:]
+                if path_obj.match(suffix_pattern):
+                    return True
+
+    return False
