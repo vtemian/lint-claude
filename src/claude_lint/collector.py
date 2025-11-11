@@ -1,7 +1,6 @@
 """File collection with pattern matching."""
 import hashlib
-from pathlib import Path
-from typing import Optional
+from pathlib import Path, PurePath
 import fnmatch
 
 from claude_lint.config import Config
@@ -63,10 +62,11 @@ class FileCollector:
                 relative = Path(file_str)
 
                 # Check if matches include patterns
-                # Handle both "**/*.py" and "*.py" patterns
+                # PurePath.match() handles ** patterns correctly for nested paths
+                # but requires at least one directory level for ** patterns
                 matches_include = any(
-                    fnmatch.fnmatch(str(relative), pattern) or
-                    fnmatch.fnmatch(str(relative), pattern.replace("**/", ""))
+                    PurePath(str(relative)).match(pattern) or
+                    (pattern.startswith("**/") and PurePath(str(relative)).match(pattern[3:]))
                     for pattern in self.config.include
                 )
 
@@ -84,8 +84,19 @@ class FileCollector:
         Returns:
             Hex digest of file content hash
         """
-        content = file_path.read_text()
-        return hashlib.sha256(content.encode()).hexdigest()
+        # Use streaming approach for large files
+        hash_obj = hashlib.sha256()
+        try:
+            # Try reading as text first
+            with open(file_path, 'rb') as f:
+                # Read in chunks to handle large files efficiently
+                for chunk in iter(lambda: f.read(65536), b''):
+                    hash_obj.update(chunk)
+        except (OSError, IOError) as e:
+            # Handle file read errors
+            raise IOError(f"Failed to read file {file_path}: {e}") from e
+
+        return hash_obj.hexdigest()
 
     def _is_excluded(self, relative_path: Path) -> bool:
         """Check if file is excluded by patterns.
