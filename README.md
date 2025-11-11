@@ -4,11 +4,16 @@ CLAUDE.md compliance checker using Claude API with prompt caching.
 
 ## Features
 
-- Smart change detection with git integration
-- Persistent caching for fast re-runs
-- Resume capability for interrupted scans
-- Batch processing with configurable size
-- Prompt caching for efficient API usage
+- Smart caching based on file and CLAUDE.md hashes
+- Multiple scan modes: full project, git diff, working directory, staged files
+- Batch processing for large projects
+- Progress tracking with resume capability
+- Prompt caching for cost efficiency
+- Configurable Claude model (Sonnet, Opus, etc.)
+- File size limits to prevent API overload
+- Atomic file writes prevent cache corruption
+- Comprehensive logging with --verbose and --quiet flags
+- Input validation for robust operation
 - Automatic retry with exponential backoff
 - Detailed and JSON output formats
 - CI/CD friendly with exit codes
@@ -119,6 +124,11 @@ Claude-lint returns exit code 0 for clean scans and 1 when violations are found:
 - **File Hashes**: Only re-checks modified files
 - **API Prompt Caching**: Claude's prompt caching keeps CLAUDE.md cached across requests
 - **Result Cache**: Stores previous analysis results in `.agent-lint-cache.json`
+
+## Documentation
+
+- [Architecture](docs/ARCHITECTURE.md) - Design decisions and module structure
+- [Troubleshooting](docs/TROUBLESHOOTING.md) - Common issues and solutions
 
 ## Development
 
