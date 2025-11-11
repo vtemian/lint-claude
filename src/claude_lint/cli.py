@@ -4,6 +4,7 @@ from pathlib import Path
 import click
 
 from claude_lint.config import load_config
+from claude_lint.logging_config import setup_logging
 from claude_lint.orchestrator import run_compliance_check
 from claude_lint.reporter import get_exit_code, format_detailed_report, format_json_report
 
@@ -14,9 +15,13 @@ from claude_lint.reporter import get_exit_code, format_detailed_report, format_j
 @click.option("--working", is_flag=True, help="Check working directory changes")
 @click.option("--staged", is_flag=True, help="Check staged files")
 @click.option("--json", "output_json", is_flag=True, help="Output as JSON")
+@click.option("--verbose", is_flag=True, help="Enable verbose logging")
+@click.option("--quiet", is_flag=True, help="Suppress warnings (errors only)")
 @click.option("--config", type=click.Path(exists=True), help="Path to config file")
-def main(full, diff, working, staged, output_json, config):
+def main(full, diff, working, staged, output_json, verbose, quiet, config):
     """Claude-lint: CLAUDE.md compliance checker."""
+    # Setup logging
+    setup_logging(verbose=verbose, quiet=quiet)
     # Determine mode
     mode_count = sum([full, bool(diff), working, staged])
     if mode_count == 0:

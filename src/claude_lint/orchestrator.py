@@ -4,6 +4,9 @@ from pathlib import Path
 from typing import Any, Optional
 
 from claude_lint.api_client import analyze_files
+from claude_lint.logging_config import get_logger
+
+logger = get_logger(__name__)
 from claude_lint.cache import Cache, CacheEntry, load_cache, save_cache
 from claude_lint.collector import collect_all_files, filter_files_by_list, compute_file_hash
 from claude_lint.config import Config
@@ -98,13 +101,13 @@ def run_compliance_check(
                 content = file_path.read_text(encoding='utf-8', errors='replace')
                 file_contents[str(rel_path)] = content
             except FileNotFoundError:
-                print(f"Warning: File not found, skipping: {rel_path}")
+                logger.warning(f"File not found, skipping: {rel_path}")
                 continue
             except UnicodeDecodeError:
-                print(f"Warning: Unable to decode file, skipping: {rel_path}")
+                logger.warning(f"Unable to decode file, skipping: {rel_path}")
                 continue
             except Exception as e:
-                print(f"Warning: Error reading file {rel_path}, skipping: {e}")
+                logger.warning(f"Error reading file {rel_path}, skipping: {e}")
                 continue
 
         # Build prompt
