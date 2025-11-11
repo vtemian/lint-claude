@@ -30,6 +30,7 @@ def test_analyze_with_caching(mock_anthropic):
     # Verify caching was used
     call_args = mock_anthropic.return_value.messages.create.call_args
     assert call_args[1]["model"] == "claude-sonnet-4-5-20250929"
+    assert call_args[1]["max_tokens"] == 4096
 
     # Check system message uses cache_control
     system_messages = call_args[1]["system"]
@@ -70,3 +71,13 @@ def test_get_usage_stats(mock_anthropic):
     assert stats["output_tokens"] == 50
     assert stats["cache_creation_tokens"] == 200
     assert stats["cache_read_tokens"] == 0
+
+
+@patch("claude_lint.api_client.Anthropic")
+def test_get_usage_stats_no_request(mock_anthropic):
+    """Test get_last_usage_stats returns None when no request has been made."""
+    client = ClaudeClient(api_key="test-key")
+
+    stats = client.get_last_usage_stats()
+
+    assert stats is None
