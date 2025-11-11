@@ -28,7 +28,7 @@ def atomic_write_json(data: Any, target_path: Path) -> None:
 
         # Atomic replace (POSIX guarantees atomicity)
         tmp_path.replace(target_path)
-    except Exception as e:
+    except Exception:
         # Clean up temp file on failure
         if tmp_path.exists():
             tmp_path.unlink()

@@ -1,5 +1,5 @@
 """Claude API client with prompt caching support."""
-from typing import Optional, Any
+from typing import Any
 from anthropic import Anthropic, APIError, APIConnectionError, RateLimitError
 
 
@@ -61,7 +61,7 @@ def analyze_files_with_client(
                 }
             ]
         )
-    except (APIError, APIConnectionError, RateLimitError) as e:
+    except (APIError, APIConnectionError, RateLimitError):
         # Re-raise specific API errors as-is
         raise
     except (KeyboardInterrupt, SystemExit):
@@ -72,7 +72,13 @@ def analyze_files_with_client(
     if not response.content:
         raise ValueError("API returned empty response content")
 
-    return response.content[0].text, response
+    # Extract text from first content block (must be TextBlock)
+    first_block = response.content[0]
+    if not hasattr(first_block, 'text'):
+        raise ValueError(
+            f"API returned non-text content (type: {type(first_block).__name__})"
+        )
+    return first_block.text, response
 
 
 def analyze_files(

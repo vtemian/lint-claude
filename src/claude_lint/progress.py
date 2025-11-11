@@ -2,7 +2,7 @@
 import json
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from claude_lint.file_utils import atomic_write_json
 

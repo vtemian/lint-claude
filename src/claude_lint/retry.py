@@ -1,6 +1,6 @@
 """Retry logic with exponential backoff."""
 import time
-from typing import Any, Callable, TypeVar
+from typing import Callable, TypeVar
 
 T = TypeVar("T")
 
@@ -27,7 +27,7 @@ def retry_with_backoff(
         KeyboardInterrupt: Immediately re-raised without retry
         SystemExit: Immediately re-raised without retry
     """
-    last_exception = None
+    last_exception: Exception | None = None
     delay = initial_delay
 
     for attempt in range(max_retries):
@@ -44,4 +44,6 @@ def retry_with_backoff(
                 delay *= backoff_factor
 
     # All retries exhausted
-    raise last_exception
+    if last_exception is not None:
+        raise last_exception
+    raise RuntimeError("retry_with_backoff: no retries executed")

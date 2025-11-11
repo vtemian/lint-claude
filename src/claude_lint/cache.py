@@ -2,7 +2,6 @@
 import json
 from dataclasses import dataclass, asdict
 from pathlib import Path
-from typing import Optional, Any
 
 from claude_lint.file_utils import atomic_write_json
 from claude_lint.types import Violation

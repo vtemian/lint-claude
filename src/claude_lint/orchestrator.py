@@ -3,10 +3,7 @@ import os
 from pathlib import Path
 from typing import Any, Optional
 
-from claude_lint.api_client import analyze_files, create_client, analyze_files_with_client
-from claude_lint.logging_config import get_logger
-
-logger = get_logger(__name__)
+from claude_lint.api_client import create_client, analyze_files_with_client
 from claude_lint.cache import Cache, CacheEntry, load_cache, save_cache
 from claude_lint.collector import collect_all_files, filter_files_by_list, compute_file_hash
 from claude_lint.config import Config
@@ -17,6 +14,7 @@ from claude_lint.git_utils import (
     get_staged_files
 )
 from claude_lint.guidelines import read_claude_md, get_claude_md_hash
+from claude_lint.logging_config import get_logger
 from claude_lint.processor import create_batches, parse_response, build_xml_prompt
 from claude_lint.progress import (
     create_progress_state,
@@ -29,12 +27,15 @@ from claude_lint.progress import (
     ProgressState
 )
 from claude_lint.retry import retry_with_backoff
+from claude_lint.types import FileResult
 from claude_lint.validation import (
     validate_project_root,
     validate_mode,
     validate_batch_size,
     validate_api_key
 )
+
+logger = get_logger(__name__)
 
 
 def run_compliance_check(
@@ -101,6 +102,7 @@ def run_compliance_check(
     progress_state = init_or_load_progress(progress_path, len(batches))
 
     # Create API client once for all batches
+    assert api_key is not None  # Validated above
     client = create_client(api_key)
 
     # Process batches
@@ -167,8 +169,10 @@ def run_compliance_check(
         response = retry_with_backoff(api_call)
 
         # Parse results
-        batch_results = parse_response(response)
-        all_results.extend(batch_results)
+        batch_results: list[FileResult] = parse_response(response)
+        # Convert FileResult to dict for compatibility with progress state
+        batch_results_dict: list[dict[str, Any]] = [dict(r) for r in batch_results]
+        all_results.extend(batch_results_dict)
 
         # Update cache
         for result in batch_results:
@@ -183,7 +187,7 @@ def run_compliance_check(
             )
 
         # Save progress
-        progress_state = update_progress(progress_state, batch_idx, batch_results)
+        progress_state = update_progress(progress_state, batch_idx, batch_results_dict)
         save_progress(progress_state, progress_path)
         save_cache(cache, cache_path)
 

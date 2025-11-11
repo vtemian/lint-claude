@@ -1,6 +1,5 @@
 """Report formatting and output."""
 import json
-from typing import Any
 
 from claude_lint.types import FileResult
 
