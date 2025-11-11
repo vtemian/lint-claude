@@ -20,6 +20,7 @@ def setup_logging(verbose: bool = False, quiet: bool = False) -> None:
     # Configure root logger for claude_lint namespace
     logger = logging.getLogger("claude_lint")
     logger.setLevel(level)
+    logger.propagate = False  # Prevent propagation to root logger
 
     # Remove existing handlers
     logger.handlers.clear()
