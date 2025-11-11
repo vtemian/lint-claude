@@ -3,6 +3,7 @@ import sys
 from pathlib import Path
 import click
 
+from claude_lint.__version__ import __version__
 from claude_lint.config import load_config
 from claude_lint.logging_config import setup_logging
 from claude_lint.orchestrator import run_compliance_check
@@ -10,6 +11,7 @@ from claude_lint.reporter import get_exit_code, format_detailed_report, format_j
 
 
 @click.command()
+@click.version_option(version=__version__, prog_name='claude-lint')
 @click.option("--full", is_flag=True, help="Full project scan")
 @click.option("--diff", type=str, help="Check files changed from branch")
 @click.option("--working", is_flag=True, help="Check working directory changes")
