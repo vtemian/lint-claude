@@ -4,25 +4,26 @@ CLAUDE.md compliance checker using Claude API with prompt caching.
 
 ## Features
 
-- 🔍 Smart change detection with git integration
-- 💾 Persistent caching for fast re-runs
-- 🔄 Resume capability for interrupted scans
-- 📦 Batch processing with configurable size
-- 🚀 Prompt caching for efficient API usage
-- 🔁 Automatic retry with exponential backoff
-- 📊 Detailed and JSON output formats
-- ✅ CI/CD friendly with exit codes
+- Smart change detection with git integration
+- Persistent caching for fast re-runs
+- Resume capability for interrupted scans
+- Batch processing with configurable size
+- Prompt caching for efficient API usage
+- Automatic retry with exponential backoff
+- Detailed and JSON output formats
+- CI/CD friendly with exit codes
 
 ## Installation
 
 ```bash
-# From source
-git clone https://github.com/yourusername/claude-lint.git
-cd claude-lint
-pip install -e .
+# Using uvx (recommended)
+uvx claude-lint --help
 
-# Or with pip (once published)
-pip install claude-lint
+# From source
+git clone https://github.com/vtemian/claude-lint.git
+cd claude-lint
+uv sync
+uv pip install -e .
 ```
 
 ## Configuration
@@ -95,8 +96,7 @@ Claude-lint returns exit code 0 for clean scans and 1 when violations are found:
 # GitHub Actions example
 - name: Check CLAUDE.md compliance
   run: |
-    pip install claude-lint
-    claude-lint --diff origin/main
+    uvx claude-lint --diff origin/main
 ```
 
 ## How It Works
@@ -120,19 +120,19 @@ Claude-lint returns exit code 0 for clean scans and 1 when violations are found:
 
 ```bash
 # Install dev dependencies
-pip install -e ".[dev]"
+uv sync
 
 # Run tests
-pytest
+uv run pytest
 
 # Run with coverage
-pytest --cov=claude_lint --cov-report=html
+uv run pytest --cov=claude_lint --cov-report=html
 
 # Lint code
-ruff check src/
+uv run ruff check src/
 
 # Format code
-ruff format src/
+uv run ruff format src/
 ```
 
 ## License

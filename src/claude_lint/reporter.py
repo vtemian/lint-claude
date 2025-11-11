@@ -23,7 +23,7 @@ def format_detailed_report(results: list[dict[str, Any]]) -> str:
         violations = result["violations"]
 
         if violations:
-            lines.append(f"📄 {file_path}")
+            lines.append(f"[FILE] {file_path}")
             lines.append(f"   {len(violations)} violation(s) found:")
             lines.append("")
 
@@ -33,12 +33,12 @@ def format_detailed_report(results: list[dict[str, Any]]) -> str:
                 line = violation.get("line")
 
                 line_info = f" (line {line})" if line else ""
-                lines.append(f"   ⚠️  [{vtype}]{line_info}")
+                lines.append(f"   [WARNING] [{vtype}]{line_info}")
                 lines.append(f"      {message}")
                 lines.append("")
         else:
-            lines.append(f"{file_path}")
-            lines.append("   ✓ No violations")
+            lines.append(f"[OK] {file_path}")
+            lines.append("   No violations")
             lines.append("")
 
     return "\n".join(lines)

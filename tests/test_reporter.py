@@ -34,7 +34,7 @@ def test_format_detailed_report():
     assert "No tests found" in report
     assert "line 42" in report
     assert "src/utils.py" in report
-    assert "✓ No violations" in report
+    assert "No violations" in report
 
 
 def test_format_json_report():
