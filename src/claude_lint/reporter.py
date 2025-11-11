@@ -2,8 +2,10 @@
 import json
 from typing import Any
 
+from claude_lint.types import FileResult
 
-def format_detailed_report(results: list[dict[str, Any]]) -> str:
+
+def format_detailed_report(results: list[FileResult]) -> str:
     """Format results as detailed human-readable report.
 
     Args:
@@ -44,7 +46,7 @@ def format_detailed_report(results: list[dict[str, Any]]) -> str:
     return "\n".join(lines)
 
 
-def format_json_report(results: list[dict[str, Any]]) -> str:
+def format_json_report(results: list[FileResult]) -> str:
     """Format results as JSON.
 
     Args:
@@ -70,7 +72,7 @@ def format_json_report(results: list[dict[str, Any]]) -> str:
     return json.dumps(report, indent=2)
 
 
-def get_exit_code(results: list[dict[str, Any]]) -> int:
+def get_exit_code(results: list[FileResult]) -> int:
     """Get exit code based on results.
 
     Args:
@@ -83,7 +85,7 @@ def get_exit_code(results: list[dict[str, Any]]) -> int:
     return 1 if has_violations else 0
 
 
-def get_summary(results: list[dict[str, Any]]) -> dict[str, int]:
+def get_summary(results: list[FileResult]) -> dict[str, int]:
     """Get summary statistics.
 
     Args:

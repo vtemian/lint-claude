@@ -5,6 +5,8 @@ import re
 import xml.sax.saxutils as saxutils
 from typing import Any
 
+from claude_lint.types import FileResult
+
 logger = logging.getLogger(__name__)
 
 
@@ -80,7 +82,7 @@ def create_batches(items: list[Any], batch_size: int) -> list[list[Any]]:
     return batches
 
 
-def parse_response(response: str) -> list[dict[str, Any]]:
+def parse_response(response: str) -> list[FileResult]:
     """Parse Claude API response to extract results.
 
     Args:
