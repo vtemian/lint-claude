@@ -36,6 +36,22 @@ def test_read_claude_md_from_home():
         assert result == content
 
 
+def test_read_claude_md_not_found():
+    """Test FileNotFoundError when CLAUDE.md not found."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmpdir = Path(tmpdir)
+        project_dir = tmpdir / "project"
+        project_dir.mkdir()
+
+        home_dir = tmpdir / "home"
+        home_dir.mkdir()
+
+        with pytest.raises(FileNotFoundError) as exc_info:
+            read_claude_md(project_dir, fallback_home=home_dir)
+
+        assert "CLAUDE.md not found" in str(exc_info.value)
+
+
 def test_get_claude_md_hash():
     """Test computing hash of CLAUDE.md content."""
     content = "# Guidelines\n\nFollow TDD."
