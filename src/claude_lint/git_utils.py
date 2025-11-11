@@ -2,6 +2,9 @@
 from pathlib import Path
 import subprocess
 
+# Timeout for git operations in seconds
+GIT_TIMEOUT = 30
+
 
 def is_git_repo(path: Path) -> bool:
     """Check if path is inside a git repository.
@@ -18,10 +21,11 @@ def is_git_repo(path: Path) -> bool:
             cwd=path,
             check=True,
             capture_output=True,
-            text=True
+            text=True,
+            timeout=GIT_TIMEOUT
         )
         return True
-    except (subprocess.CalledProcessError, FileNotFoundError):
+    except (subprocess.CalledProcessError, FileNotFoundError, subprocess.TimeoutExpired):
         return False
 
 
@@ -34,14 +38,21 @@ def get_changed_files_from_branch(repo_path: Path, base_branch: str) -> list[str
 
     Returns:
         List of changed file paths relative to repo root
+
+    Raises:
+        RuntimeError: If git command times out or fails
     """
-    result = subprocess.run(
-        ["git", "diff", "--name-only", base_branch],
-        cwd=repo_path,
-        check=True,
-        capture_output=True,
-        text=True
-    )
+    try:
+        result = subprocess.run(
+            ["git", "diff", "--name-only", base_branch],
+            cwd=repo_path,
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=GIT_TIMEOUT
+        )
+    except subprocess.TimeoutExpired as e:
+        raise RuntimeError(f"Git command timed out after {GIT_TIMEOUT}s") from e
 
     files = [f.strip() for f in result.stdout.split("\n") if f.strip()]
     return files
@@ -55,26 +66,34 @@ def get_working_directory_files(repo_path: Path) -> list[str]:
 
     Returns:
         List of modified/untracked file paths relative to repo root
-    """
-    # Get modified files
-    result = subprocess.run(
-        ["git", "diff", "--name-only"],
-        cwd=repo_path,
-        check=True,
-        capture_output=True,
-        text=True
-    )
-    modified = [f.strip() for f in result.stdout.split("\n") if f.strip()]
 
-    # Get untracked files
-    result = subprocess.run(
-        ["git", "ls-files", "--others", "--exclude-standard"],
-        cwd=repo_path,
-        check=True,
-        capture_output=True,
-        text=True
-    )
-    untracked = [f.strip() for f in result.stdout.split("\n") if f.strip()]
+    Raises:
+        RuntimeError: If git command times out or fails
+    """
+    try:
+        # Get modified files
+        result = subprocess.run(
+            ["git", "diff", "--name-only"],
+            cwd=repo_path,
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=GIT_TIMEOUT
+        )
+        modified = [f.strip() for f in result.stdout.split("\n") if f.strip()]
+
+        # Get untracked files
+        result = subprocess.run(
+            ["git", "ls-files", "--others", "--exclude-standard"],
+            cwd=repo_path,
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=GIT_TIMEOUT
+        )
+        untracked = [f.strip() for f in result.stdout.split("\n") if f.strip()]
+    except subprocess.TimeoutExpired as e:
+        raise RuntimeError(f"Git command timed out after {GIT_TIMEOUT}s") from e
 
     return list(set(modified + untracked))
 
@@ -87,14 +106,21 @@ def get_staged_files(repo_path: Path) -> list[str]:
 
     Returns:
         List of staged file paths relative to repo root
+
+    Raises:
+        RuntimeError: If git command times out or fails
     """
-    result = subprocess.run(
-        ["git", "diff", "--name-only", "--cached"],
-        cwd=repo_path,
-        check=True,
-        capture_output=True,
-        text=True
-    )
+    try:
+        result = subprocess.run(
+            ["git", "diff", "--name-only", "--cached"],
+            cwd=repo_path,
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=GIT_TIMEOUT
+        )
+    except subprocess.TimeoutExpired as e:
+        raise RuntimeError(f"Git command timed out after {GIT_TIMEOUT}s") from e
 
     files = [f.strip() for f in result.stdout.split("\n") if f.strip()]
     return files
