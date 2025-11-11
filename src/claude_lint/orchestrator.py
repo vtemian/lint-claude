@@ -29,6 +29,12 @@ from claude_lint.progress import (
     ProgressState
 )
 from claude_lint.retry import retry_with_backoff
+from claude_lint.validation import (
+    validate_project_root,
+    validate_mode,
+    validate_batch_size,
+    validate_api_key
+)
 
 
 def run_compliance_check(
@@ -47,11 +53,18 @@ def run_compliance_check(
 
     Returns:
         List of results for all checked files
+
+    Raises:
+        ValueError: If inputs are invalid
     """
+    # Input validation
+    validate_project_root(project_root)
+    validate_mode(mode)
+    validate_batch_size(config.batch_size)
+
     # Get API key
     api_key = config.api_key or os.environ.get("ANTHROPIC_API_KEY")
-    if not api_key:
-        raise ValueError("API key required via config or ANTHROPIC_API_KEY env var")
+    validate_api_key(api_key)
 
     # Load CLAUDE.md
     guidelines = read_claude_md(project_root)

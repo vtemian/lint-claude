@@ -25,10 +25,10 @@ def main(full, diff, working, staged, output_json, verbose, quiet, config):
     # Determine mode
     mode_count = sum([full, bool(diff), working, staged])
     if mode_count == 0:
-        click.echo("Error: Must specify one mode: --full, --diff, --working, or --staged")
+        click.echo("Error: Must specify one mode: --full, --diff, --working, or --staged", err=True)
         sys.exit(2)
     elif mode_count > 1:
-        click.echo("Error: Only one mode can be specified")
+        click.echo("Error: Only one mode can be specified", err=True)
         sys.exit(2)
 
     if full:
