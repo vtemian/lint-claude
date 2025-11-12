@@ -60,6 +60,8 @@ class RateLimiter:
 
             # Record this request
             self.requests.append(time.time())
+            # Notify waiting threads that a request completed (slot may be available)
+            self._condition.notify()
 
     def try_acquire(self) -> bool:
         """Try to acquire a token without blocking.
@@ -67,9 +69,9 @@ class RateLimiter:
         Returns:
             True if token acquired, False if at rate limit
 
-        Thread-safe: Uses lock to prevent race conditions.
+        Thread-safe: Uses condition variable for consistent locking.
         """
-        with self._lock:
+        with self._condition:
             now = time.time()
 
             # Remove requests outside the current window
@@ -82,4 +84,6 @@ class RateLimiter:
 
             # Record this request
             self.requests.append(now)
+            # Notify waiting threads that a request completed (slot may be available)
+            self._condition.notify()
             return True
