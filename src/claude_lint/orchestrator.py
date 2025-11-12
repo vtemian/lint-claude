@@ -39,6 +39,106 @@ from claude_lint.validation import (
 logger = get_logger(__name__)
 
 
+def _process_all_batches(
+    batches: list[list[Path]],
+    project_root: Path,
+    config: Config,
+    guidelines: str,
+    guidelines_hash: str,
+    client: Any,
+    rate_limiter: RateLimiter,
+    cache: Cache,
+    progress_state: ProgressState,
+    progress_path: Path,
+) -> tuple[list[dict[str, Any]], int]:
+    """Process all batches with optional progress bar.
+
+    Args:
+        batches: List of file batches to process
+        project_root: Project root directory
+        config: Configuration
+        guidelines: CLAUDE.md content
+        guidelines_hash: Hash of CLAUDE.md
+        client: Anthropic API client
+        rate_limiter: Rate limiter for API calls
+        cache: Cache object
+        progress_state: Progress tracking state
+        progress_path: Path to progress file
+
+    Returns:
+        Tuple of (all results, API calls made)
+    """
+    all_results = list(progress_state.results)
+    api_calls_made = 0
+
+    # Determine if we should show progress
+    show_progress = config.show_progress and not os.environ.get("CLAUDE_LINT_NO_PROGRESS")
+
+    remaining_batches = list(get_remaining_batch_indices(progress_state))
+    cache_path = project_root / ".agent-lint-cache.json"
+
+    # Common batch processing logic
+    def process_batches_iter(
+        progress_callback: Any = None,
+    ) -> Any:
+        nonlocal api_calls_made
+
+        for idx, batch_idx in enumerate(remaining_batches):
+            batch = batches[batch_idx]
+
+            if progress_callback:
+                progress_callback(idx, batch_idx, len(batch))
+
+            batch_results = process_batch(
+                batch,
+                project_root,
+                config,
+                guidelines,
+                guidelines_hash,
+                client,
+                rate_limiter,
+                cache,
+            )
+
+            all_results.extend(batch_results)
+            api_calls_made += 1
+
+            nonlocal progress_state
+            progress_state = update_progress(progress_state, batch_idx, batch_results)
+            save_progress(progress_state, progress_path)
+            save_cache(cache, cache_path)
+
+            yield batch_results
+
+    if show_progress:
+        from rich.progress import BarColumn, Progress, SpinnerColumn, TaskProgressColumn, TextColumn
+
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[bold blue]{task.description}"),
+            BarColumn(),
+            TaskProgressColumn(),
+            TextColumn("[bold cyan]{task.fields[status]}"),
+        ) as progress:
+            task = progress.add_task(
+                "Analyzing files", total=len(remaining_batches), status="Starting..."
+            )
+
+            def progress_callback(idx: int, batch_idx: int, batch_size: int) -> None:
+                progress.update(
+                    task, status=f"Batch {idx + 1}/{len(remaining_batches)} ({batch_size} files)"
+                )
+
+            for _ in process_batches_iter(progress_callback):
+                progress.update(task, advance=1, status="Complete")
+    else:
+        # No progress bar - just iterate
+        for _ in process_batches_iter():
+            pass
+
+    return all_results, api_calls_made
+
+
 def run_compliance_check(
     project_root: Path, config: Config, mode: str = "full", base_branch: str | None = None
 ) -> tuple[list[dict[str, Any]], AnalysisMetrics]:
@@ -119,76 +219,20 @@ def run_compliance_check(
     )
 
     # Process batches with optional progress bar
-    # Note: Cache is saved after each batch to prevent data loss on crashes
-    all_results = list(progress_state.results)  # Start with resumed results
+    all_results, api_calls_made = _process_all_batches(
+        batches=batches,
+        project_root=project_root,
+        config=config,
+        guidelines=guidelines,
+        guidelines_hash=guidelines_hash,
+        client=client,
+        rate_limiter=rate_limiter,
+        cache=cache,
+        progress_state=progress_state,
+        progress_path=progress_path,
+    )
 
-    # Determine if we should show progress
-    show_progress = config.show_progress and not os.environ.get("CLAUDE_LINT_NO_PROGRESS")
-
-    remaining_batches = list(get_remaining_batch_indices(progress_state))
-
-    if show_progress:
-        from rich.progress import BarColumn, Progress, SpinnerColumn, TaskProgressColumn, TextColumn
-
-        with Progress(
-            SpinnerColumn(),
-            TextColumn("[bold blue]{task.description}"),
-            BarColumn(),
-            TaskProgressColumn(),
-            TextColumn("[bold cyan]{task.fields[status]}"),
-        ) as progress:
-            task = progress.add_task(
-                "Analyzing files", total=len(remaining_batches), status="Starting..."
-            )
-
-            for idx, batch_idx in enumerate(remaining_batches):
-                batch = batches[batch_idx]
-
-                progress.update(
-                    task, status=f"Batch {idx + 1}/{len(remaining_batches)} ({len(batch)} files)"
-                )
-
-                batch_results = process_batch(
-                    batch,
-                    project_root,
-                    config,
-                    guidelines,
-                    guidelines_hash,
-                    client,
-                    rate_limiter,
-                    cache,
-                )
-
-                all_results.extend(batch_results)
-                metrics.api_calls_made += 1
-
-                progress_state = update_progress(progress_state, batch_idx, batch_results)
-                save_progress(progress_state, progress_path)
-                save_cache(cache, cache_path)
-
-                progress.update(task, advance=1, status="Complete")
-    else:
-        # No progress bar
-        for batch_idx in remaining_batches:
-            batch = batches[batch_idx]
-
-            batch_results = process_batch(
-                batch,
-                project_root,
-                config,
-                guidelines,
-                guidelines_hash,
-                client,
-                rate_limiter,
-                cache,
-            )
-
-            all_results.extend(batch_results)
-            metrics.api_calls_made += 1
-
-            progress_state = update_progress(progress_state, batch_idx, batch_results)
-            save_progress(progress_state, progress_path)
-            save_cache(cache, cache_path)
+    metrics.api_calls_made = api_calls_made
 
     # Cleanup progress on completion
     if is_progress_complete(progress_state):
