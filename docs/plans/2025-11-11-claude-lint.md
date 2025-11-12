@@ -23,7 +23,7 @@
 
 ```toml
 [project]
-name = "claude-lint"
+name = "lint-claude"
 version = "0.1.0"
 description = "CLAUDE.md compliance checker using Claude API"
 requires-python = ">=3.11"
@@ -41,7 +41,7 @@ dev = [
 ]
 
 [project.scripts]
-claude-lint = "claude_lint.cli:main"
+lint-claude = "claude_lint.cli:main"
 
 [build-system]
 requires = ["setuptools>=68.0"]
@@ -82,7 +82,7 @@ wheels/
 .pytest_cache/
 .coverage
 htmlcov/
-.agent-lint-cache.json
+.lint-claude-cache.json
 .venv/
 venv/
 ```
@@ -90,7 +90,7 @@ venv/
 **Step 3: Create basic README**
 
 ```markdown
-# claude-lint
+# lint-claude
 
 CLAUDE.md compliance checker using Claude API with prompt caching.
 
@@ -104,18 +104,18 @@ pip install -e .
 
 ```bash
 # Check changed files from main branch
-claude-lint --diff main
+lint-claude --diff main
 
 # Check working directory changes
-claude-lint --working
+lint-claude --working
 
 # Full project scan
-claude-lint --full
+lint-claude --full
 ```
 
 ## Configuration
 
-Create `.agent-lint.json`:
+Create `.lint-claude.json`:
 
 ```json
 {
@@ -144,7 +144,7 @@ Expected: Directory structure created with __init__.py files
 ```bash
 git init
 git add pyproject.toml .gitignore README.md src/ tests/
-git commit -m "chore: initialize claude-lint project structure"
+git commit -m "chore: initialize lint-claude project structure"
 ```
 
 ---
@@ -154,7 +154,7 @@ git commit -m "chore: initialize claude-lint project structure"
 **Files:**
 - Create: `src/claude_lint/config.py`
 - Create: `tests/test_config.py`
-- Create: `.agent-lint.json` (example)
+- Create: `.lint-claude.json` (example)
 
 **Step 1: Write failing test for config loading**
 
@@ -171,7 +171,7 @@ from claude_lint.config import Config, load_config
 def test_load_config_with_defaults():
     """Test loading config with default values."""
     with tempfile.TemporaryDirectory() as tmpdir:
-        config_path = Path(tmpdir) / ".agent-lint.json"
+        config_path = Path(tmpdir) / ".lint-claude.json"
         config_path.write_text(json.dumps({}))
 
         config = load_config(config_path)
@@ -184,7 +184,7 @@ def test_load_config_with_defaults():
 def test_load_config_with_custom_values():
     """Test loading config with custom values."""
     with tempfile.TemporaryDirectory() as tmpdir:
-        config_path = Path(tmpdir) / ".agent-lint.json"
+        config_path = Path(tmpdir) / ".lint-claude.json"
         config_data = {
             "include": ["src/**/*.py"],
             "exclude": ["tests/**"],
@@ -201,7 +201,7 @@ def test_load_config_with_custom_values():
 
 def test_load_config_missing_file():
     """Test loading config when file doesn't exist uses defaults."""
-    config = load_config(Path("/nonexistent/.agent-lint.json"))
+    config = load_config(Path("/nonexistent/.lint-claude.json"))
 
     assert config.include == ["**/*.py", "**/*.js", "**/*.ts"]
     assert config.batch_size == 10
@@ -217,7 +217,7 @@ Expected: FAIL with "No module named 'claude_lint.config'"
 Create `src/claude_lint/config.py`:
 
 ```python
-"""Configuration management for claude-lint."""
+"""Configuration management for lint-claude."""
 import json
 from dataclasses import dataclass
 from pathlib import Path
@@ -226,7 +226,7 @@ from typing import Optional
 
 @dataclass
 class Config:
-    """Configuration for claude-lint."""
+    """Configuration for lint-claude."""
     include: list[str]
     exclude: list[str]
     batch_size: int
@@ -247,7 +247,7 @@ def load_config(config_path: Path) -> Config:
     """Load configuration from file or return defaults.
 
     Args:
-        config_path: Path to .agent-lint.json file
+        config_path: Path to .lint-claude.json file
 
     Returns:
         Config object with loaded or default values
@@ -275,7 +275,7 @@ Expected: All 3 tests PASS
 
 **Step 5: Create example config file**
 
-Create `.agent-lint.json`:
+Create `.lint-claude.json`:
 
 ```json
 {
@@ -288,7 +288,7 @@ Create `.agent-lint.json`:
 **Step 6: Commit**
 
 ```bash
-git add src/claude_lint/config.py tests/test_config.py .agent-lint.json
+git add src/claude_lint/config.py tests/test_config.py .lint-claude.json
 git commit -m "feat: add configuration schema and loader"
 ```
 
@@ -461,7 +461,7 @@ def test_cache_entry_creation():
 def test_load_cache_empty():
     """Test loading cache when file doesn't exist."""
     with tempfile.TemporaryDirectory() as tmpdir:
-        cache_path = Path(tmpdir) / ".agent-lint-cache.json"
+        cache_path = Path(tmpdir) / ".lint-claude-cache.json"
 
         cache = load_cache(cache_path)
 
@@ -472,7 +472,7 @@ def test_load_cache_empty():
 def test_save_and_load_cache():
     """Test saving and loading cache."""
     with tempfile.TemporaryDirectory() as tmpdir:
-        cache_path = Path(tmpdir) / ".agent-lint-cache.json"
+        cache_path = Path(tmpdir) / ".lint-claude-cache.json"
 
         # Create cache with entry
         cache = Cache(
@@ -1646,7 +1646,7 @@ from claude_lint.progress import ProgressTracker, ProgressState
 def test_progress_tracker_initialization():
     """Test initializing progress tracker."""
     with tempfile.TemporaryDirectory() as tmpdir:
-        progress_file = Path(tmpdir) / ".agent-lint-progress.json"
+        progress_file = Path(tmpdir) / ".lint-claude-progress.json"
 
         tracker = ProgressTracker(progress_file, total_batches=5)
 
@@ -1658,7 +1658,7 @@ def test_progress_tracker_initialization():
 def test_update_progress():
     """Test updating progress."""
     with tempfile.TemporaryDirectory() as tmpdir:
-        progress_file = Path(tmpdir) / ".agent-lint-progress.json"
+        progress_file = Path(tmpdir) / ".lint-claude-progress.json"
 
         tracker = ProgressTracker(progress_file, total_batches=3)
 
@@ -1672,7 +1672,7 @@ def test_update_progress():
 def test_save_and_load_progress():
     """Test saving and loading progress."""
     with tempfile.TemporaryDirectory() as tmpdir:
-        progress_file = Path(tmpdir) / ".agent-lint-progress.json"
+        progress_file = Path(tmpdir) / ".lint-claude-progress.json"
 
         # Create and save progress
         tracker = ProgressTracker(progress_file, total_batches=5)
@@ -1692,7 +1692,7 @@ def test_save_and_load_progress():
 def test_resume_from_progress():
     """Test resuming from saved progress."""
     with tempfile.TemporaryDirectory() as tmpdir:
-        progress_file = Path(tmpdir) / ".agent-lint-progress.json"
+        progress_file = Path(tmpdir) / ".lint-claude-progress.json"
 
         # Create initial progress
         tracker = ProgressTracker(progress_file, total_batches=5)
@@ -1710,7 +1710,7 @@ def test_resume_from_progress():
 def test_cleanup_on_complete():
     """Test that progress file is cleaned up when complete."""
     with tempfile.TemporaryDirectory() as tmpdir:
-        progress_file = Path(tmpdir) / ".agent-lint-progress.json"
+        progress_file = Path(tmpdir) / ".lint-claude-progress.json"
 
         tracker = ProgressTracker(progress_file, total_batches=2)
         tracker.update(batch_index=0, results=[])
@@ -2230,7 +2230,7 @@ from claude_lint.retry import retry_with_backoff
 
 
 class Orchestrator:
-    """Main orchestrator for claude-lint."""
+    """Main orchestrator for lint-claude."""
 
     def __init__(self, project_root: Path, config: Config):
         """Initialize orchestrator.
@@ -2256,12 +2256,12 @@ class Orchestrator:
         self.guidelines_hash = get_claude_md_hash(self.guidelines)
 
         # Load cache
-        cache_path = project_root / ".agent-lint-cache.json"
+        cache_path = project_root / ".lint-claude-cache.json"
         self.cache = load_cache(cache_path)
         self.cache_path = cache_path
 
         # Progress tracking
-        progress_path = project_root / ".agent-lint-progress.json"
+        progress_path = project_root / ".lint-claude-progress.json"
         self.progress_path = progress_path
 
     def run(
@@ -2465,7 +2465,7 @@ def test_cli_full_scan(mock_orchestrator):
 
     with runner.isolated_filesystem():
         # Create config
-        Path(".agent-lint.json").write_text('{"include": ["**/*.py"]}')
+        Path(".lint-claude.json").write_text('{"include": ["**/*.py"]}')
         Path("CLAUDE.md").write_text("# Guidelines")
 
         # Mock orchestrator
@@ -2488,7 +2488,7 @@ def test_cli_diff_mode(mock_orchestrator):
     runner = CliRunner()
 
     with runner.isolated_filesystem():
-        Path(".agent-lint.json").write_text('{}')
+        Path(".lint-claude.json").write_text('{}')
         Path("CLAUDE.md").write_text("# Guidelines")
 
         mock_orch = Mock()
@@ -2509,7 +2509,7 @@ def test_cli_json_output(mock_orchestrator):
     runner = CliRunner()
 
     with runner.isolated_filesystem():
-        Path(".agent-lint.json").write_text('{}')
+        Path(".lint-claude.json").write_text('{}')
         Path("CLAUDE.md").write_text("# Guidelines")
 
         mock_orch = Mock()
@@ -2531,7 +2531,7 @@ def test_cli_exit_code_on_violations(mock_orchestrator):
     runner = CliRunner()
 
     with runner.isolated_filesystem():
-        Path(".agent-lint.json").write_text('{}')
+        Path(".lint-claude.json").write_text('{}')
         Path("CLAUDE.md").write_text("# Guidelines")
 
         mock_orch = Mock()
@@ -2558,7 +2558,7 @@ Expected: FAIL with "No module named 'claude_lint.cli'"
 Create `src/claude_lint/cli.py`:
 
 ```python
-"""Command-line interface for claude-lint."""
+"""Command-line interface for lint-claude."""
 import sys
 from pathlib import Path
 import click
@@ -2601,7 +2601,7 @@ def main(full, diff, working, staged, output_json, config):
 
     # Load config
     project_root = Path.cwd()
-    config_path = Path(config) if config else project_root / ".agent-lint.json"
+    config_path = Path(config) if config else project_root / ".lint-claude.json"
     cfg = load_config(config_path)
 
     try:
@@ -2709,7 +2709,7 @@ def process(data):
 ''')
 
         # Create config
-        (tmpdir / ".agent-lint.json").write_text('''
+        (tmpdir / ".lint-claude.json").write_text('''
 {
   "include": ["**/*.py"],
   "exclude": ["tests/**"],
@@ -2717,7 +2717,7 @@ def process(data):
 }
 ''')
 
-        # Run claude-lint
+        # Run lint-claude
         result = subprocess.run(
             ["python", "-m", "claude_lint.cli", "--full"],
             cwd=tmpdir,
@@ -2739,7 +2739,7 @@ def process(data):
 Update `README.md`:
 
 ```markdown
-# claude-lint
+# lint-claude
 
 CLAUDE.md compliance checker using Claude API with prompt caching.
 
@@ -2758,17 +2758,17 @@ CLAUDE.md compliance checker using Claude API with prompt caching.
 
 ```bash
 # From source
-git clone https://github.com/yourusername/claude-lint.git
-cd claude-lint
+git clone https://github.com/yourusername/lint-claude.git
+cd lint-claude
 pip install -e .
 
 # Or with pip (once published)
-pip install claude-lint
+pip install lint-claude
 ```
 
 ## Configuration
 
-Create `.agent-lint.json` in your project root:
+Create `.lint-claude.json` in your project root:
 
 ```json
 {
@@ -2798,34 +2798,34 @@ Or specify in config:
 ### Full Project Scan
 
 ```bash
-claude-lint --full
+lint-claude --full
 ```
 
 ### Check Changes from Branch
 
 ```bash
-claude-lint --diff main
-claude-lint --diff origin/develop
+lint-claude --diff main
+lint-claude --diff origin/develop
 ```
 
 ### Check Working Directory
 
 ```bash
 # Check modified and untracked files
-claude-lint --working
+lint-claude --working
 ```
 
 ### Check Staged Files
 
 ```bash
 # Check only staged files
-claude-lint --staged
+lint-claude --staged
 ```
 
 ### JSON Output
 
 ```bash
-claude-lint --full --json > results.json
+lint-claude --full --json > results.json
 ```
 
 ## CI/CD Integration
@@ -2836,8 +2836,8 @@ Claude-lint returns exit code 0 for clean scans and 1 when violations are found:
 # GitHub Actions example
 - name: Check CLAUDE.md compliance
   run: |
-    pip install claude-lint
-    claude-lint --diff origin/main
+    pip install lint-claude
+    lint-claude --diff origin/main
 ```
 
 ## How It Works
@@ -2855,7 +2855,7 @@ Claude-lint returns exit code 0 for clean scans and 1 when violations are found:
 - **CLAUDE.md Hash**: Triggers full re-scan when guidelines change
 - **File Hashes**: Only re-checks modified files
 - **API Prompt Caching**: Claude's prompt caching keeps CLAUDE.md cached across requests
-- **Result Cache**: Stores previous analysis results in `.agent-lint-cache.json`
+- **Result Cache**: Stores previous analysis results in `.lint-claude-cache.json`
 
 ## Development
 
@@ -2913,7 +2913,7 @@ Expected: Package installed successfully
 
 **Step 2: Verify CLI is available**
 
-Run: `claude-lint --help`
+Run: `lint-claude --help`
 Expected: Help text displayed
 
 **Step 3: Run full test suite**
@@ -2925,14 +2925,14 @@ Expected: All tests pass with good coverage
 
 ```bash
 # In a test project with CLAUDE.md
-claude-lint --full
+lint-claude --full
 ```
 
 Expected: Analysis completes successfully
 
 **Step 5: Clean up cache files from testing**
 
-Run: `find . -name ".agent-lint-cache.json" -delete && find . -name ".agent-lint-progress.json" -delete`
+Run: `find . -name ".lint-claude-cache.json" -delete && find . -name ".lint-claude-progress.json" -delete`
 Expected: Cache files removed
 
 **Step 6: Final commit**

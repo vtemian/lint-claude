@@ -62,40 +62,6 @@ wheels = [
 ]
 
 [[package]]
-name = "claude-lint"
-version = "0.3.0"
-source = { editable = "." }
-dependencies = [
-    { name = "anthropic" },
-    { name = "click" },
-    { name = "pydantic" },
-    { name = "rich" },
-]
-
-[package.optional-dependencies]
-dev = [
-    { name = "mypy" },
-    { name = "pre-commit" },
-    { name = "pytest" },
-    { name = "pytest-cov" },
-    { name = "ruff" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "anthropic", specifier = ">=0.18.0,<0.50" },
-    { name = "click", specifier = ">=8.1.0,<9.0" },
-    { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.8.0,<2.0" },
-    { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=3.5.0,<4.0" },
-    { name = "pydantic", specifier = ">=2.0.0,<3.0" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.4.0,<8.0" },
-    { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.1.0,<5.0" },
-    { name = "rich", specifier = ">=13.0.0,<14.0" },
-    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.1.0,<0.3" },
-]
-provides-extras = ["dev"]
-
-[[package]]
 name = "click"
 version = "8.3.0"
 source = { registry = "https://pypi.org/simple" }
@@ -383,6 +349,40 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/8c/3e/e7e06743294eea2cf02ced6aa0ff2ad237367394e37a0e2b4a1108c67a36/jiter-0.12.0-graalpy312-graalpy250_312_native-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:d96b264ab7d34bbb2312dedc47ce07cd53f06835eacbc16dde3761f47c3a9e7f", size = 338537, upload-time = "2025-11-09T20:49:20.317Z" },
     { url = "https://files.pythonhosted.org/packages/2f/9c/6753e6522b8d0ef07d3a3d239426669e984fb0eba15a315cdbc1253904e4/jiter-0.12.0-graalpy312-graalpy250_312_native-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:c24e864cb30ab82311c6425655b0cdab0a98c5d973b065c66a3f020740c2324c", size = 346110, upload-time = "2025-11-09T20:49:21.817Z" },
 ]
+
+[[package]]
+name = "lint-claude"
+version = "0.3.0"
+source = { editable = "." }
+dependencies = [
+    { name = "anthropic" },
+    { name = "click" },
+    { name = "pydantic" },
+    { name = "rich" },
+]
+
+[package.optional-dependencies]
+dev = [
+    { name = "mypy" },
+    { name = "pre-commit" },
+    { name = "pytest" },
+    { name = "pytest-cov" },
+    { name = "ruff" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "anthropic", specifier = ">=0.18.0,<0.50" },
+    { name = "click", specifier = ">=8.1.0,<9.0" },
+    { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.8.0,<2.0" },
+    { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=3.5.0,<4.0" },
+    { name = "pydantic", specifier = ">=2.0.0,<3.0" },
+    { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.4.0,<8.0" },
+    { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.1.0,<5.0" },
+    { name = "rich", specifier = ">=13.0.0,<14.0" },
+    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.1.0,<0.3" },
+]
+provides-extras = ["dev"]
 
 [[package]]
 name = "markdown-it-py"

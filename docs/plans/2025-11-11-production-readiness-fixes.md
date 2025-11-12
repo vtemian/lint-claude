@@ -296,7 +296,7 @@ Expected: FAIL (Config doesn't validate yet)
 
 ```python
 # src/claude_lint/config.py
-"""Configuration management for claude-lint."""
+"""Configuration management for lint-claude."""
 import json
 from pathlib import Path
 from typing import Optional
@@ -304,7 +304,7 @@ from pydantic import BaseModel, Field, field_validator
 
 
 class Config(BaseModel):
-    """Configuration for claude-lint with validation."""
+    """Configuration for lint-claude with validation."""
 
     include: list[str] = Field(min_length=1, description="File patterns to include")
     exclude: list[str] = Field(default_factory=list, description="File patterns to exclude")
@@ -358,7 +358,7 @@ def load_config(config_path: Path) -> Config:
     Supports both snake_case (preferred) and camelCase (backwards compat) keys.
 
     Args:
-        config_path: Path to .agent-lint.json file
+        config_path: Path to .lint-claude.json file
 
     Returns:
         Config object with loaded or default values
@@ -1509,7 +1509,7 @@ git commit -m "feat: add pre-commit hooks for code quality automation"
 ```toml
 # pyproject.toml
 [project]
-name = "claude-lint"
+name = "lint-claude"
 version = "0.3.0"
 description = "CLAUDE.md compliance checker using Claude API"
 requires-python = ">=3.11"
@@ -1631,7 +1631,7 @@ git commit -m "feat: add comprehensive ruff lint rules for code quality"
 ```toml
 # pyproject.toml
 [project]
-name = "claude-lint"
+name = "lint-claude"
 version = "0.3.0"
 description = "CLAUDE.md compliance checker using Claude API"
 readme = "README.md"
@@ -1664,11 +1664,11 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourusername/claude-lint"
-Documentation = "https://github.com/yourusername/claude-lint/blob/main/README.md"
-Repository = "https://github.com/yourusername/claude-lint"
-Issues = "https://github.com/yourusername/claude-lint/issues"
-Changelog = "https://github.com/yourusername/claude-lint/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/yourusername/lint-claude"
+Documentation = "https://github.com/yourusername/lint-claude/blob/main/README.md"
+Repository = "https://github.com/yourusername/lint-claude"
+Issues = "https://github.com/yourusername/lint-claude/issues"
+Changelog = "https://github.com/yourusername/lint-claude/blob/main/CHANGELOG.md"
 
 dependencies = [
     "anthropic>=0.18.0,<0.50",
@@ -1687,7 +1687,7 @@ dev = [
 ]
 
 [project.scripts]
-claude-lint = "claude_lint.cli:main"
+lint-claude = "claude_lint.cli:main"
 
 [build-system]
 requires = ["setuptools>=68.0"]

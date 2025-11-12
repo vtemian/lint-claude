@@ -2,7 +2,7 @@
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
-**Goal:** Transform claude-lint from B- quality to A-grade production-ready CLI tool by fixing critical architectural issues, adding essential features (rate limiting, progress bars, timeouts), and refactoring the god function.
+**Goal:** Transform lint-claude from B- quality to A-grade production-ready CLI tool by fixing critical architectural issues, adding essential features (rate limiting, progress bars, timeouts), and refactoring the god function.
 
 **Architecture:** Refactor orchestrator from monolithic god function into focused, single-responsibility components. Add rate limiting layer for API calls, progress tracking for UX, and performance optimizations. Maintain functional architecture (no classes) while improving separation of concerns.
 
@@ -235,7 +235,7 @@ Modify `src/claude_lint/config.py`:
 ```python
 @dataclass
 class Config:
-    """Configuration for claude-lint."""
+    """Configuration for lint-claude."""
     include: list[str]
     exclude: list[str]
     batch_size: int
@@ -541,7 +541,7 @@ Modify `src/claude_lint/config.py`:
 ```python
 @dataclass
 class Config:
-    """Configuration for claude-lint."""
+    """Configuration for lint-claude."""
     include: list[str]
     exclude: list[str]
     batch_size: int
@@ -775,7 +775,7 @@ Modify `src/claude_lint/config.py`:
 ```python
 @dataclass
 class Config:
-    """Configuration for claude-lint."""
+    """Configuration for lint-claude."""
     include: list[str]
     exclude: list[str]
     batch_size: int
@@ -995,7 +995,7 @@ Expected: PASS (2 tests)
 
 **Step 8: Manual test with progress bar**
 
-Run: `uv run claude-lint --full` in a test directory
+Run: `uv run lint-claude --full` in a test directory
 Expected: See progress bar with spinner and batch count
 
 **Step 9: Commit**
@@ -1521,7 +1521,7 @@ def multiply(x, y):  # Missing type hints
 GLOBAL_VAR = 42  # Global variable
 ```
 
-Create `tests/integration/fixtures/test_project/.agent-lint.json`:
+Create `tests/integration/fixtures/test_project/.lint-claude.json`:
 ```json
 {
   "include": ["**/*.py"],
@@ -1568,7 +1568,7 @@ def test_full_scan_with_real_api(test_project):
     """Test full scan with real API call."""
     # Run CLI
     result = subprocess.run(
-        ["uv", "run", "claude-lint", "--full", "--json"],
+        ["uv", "run", "lint-claude", "--full", "--json"],
         cwd=test_project,
         capture_output=True,
         text=True,
@@ -1594,7 +1594,7 @@ def test_full_scan_without_api_key(test_project, monkeypatch):
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
 
     result = subprocess.run(
-        ["uv", "run", "claude-lint", "--full"],
+        ["uv", "run", "lint-claude", "--full"],
         cwd=test_project,
         capture_output=True,
         text=True
@@ -1608,7 +1608,7 @@ def test_keyboard_interrupt_handling(test_project):
     """Test that Ctrl-C is handled gracefully."""
     # Start process
     proc = subprocess.Popen(
-        ["uv", "run", "claude-lint", "--full"],
+        ["uv", "run", "lint-claude", "--full"],
         cwd=test_project,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -1631,7 +1631,7 @@ def test_keyboard_interrupt_handling(test_project):
 def test_progress_bar_output(test_project):
     """Test that progress bar is shown."""
     result = subprocess.run(
-        ["uv", "run", "claude-lint", "--full"],
+        ["uv", "run", "lint-claude", "--full"],
         cwd=test_project,
         capture_output=True,
         text=True,
@@ -1648,7 +1648,7 @@ def test_cache_persistence(test_project):
     """Test that cache is persisted and reused."""
     # First run
     result1 = subprocess.run(
-        ["uv", "run", "claude-lint", "--full", "--json"],
+        ["uv", "run", "lint-claude", "--full", "--json"],
         cwd=test_project,
         capture_output=True,
         text=True,
@@ -1656,12 +1656,12 @@ def test_cache_persistence(test_project):
     )
 
     # Cache file should exist
-    cache_file = test_project / ".agent-lint-cache.json"
+    cache_file = test_project / ".lint-claude-cache.json"
     assert cache_file.exists()
 
     # Second run should be faster (uses cache)
     result2 = subprocess.run(
-        ["uv", "run", "claude-lint", "--full", "--json"],
+        ["uv", "run", "lint-claude", "--full", "--json"],
         cwd=test_project,
         capture_output=True,
         text=True,
@@ -1678,13 +1678,13 @@ def test_cache_persistence(test_project):
 def test_version_flag():
     """Test --version flag works."""
     result = subprocess.run(
-        ["uv", "run", "claude-lint", "--version"],
+        ["uv", "run", "lint-claude", "--version"],
         capture_output=True,
         text=True
     )
 
     assert result.returncode == 0
-    assert "claude-lint" in result.stdout
+    assert "lint-claude" in result.stdout
     assert "0.2.0" in result.stdout
 ```
 

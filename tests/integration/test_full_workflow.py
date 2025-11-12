@@ -26,7 +26,7 @@ def test_full_scan_with_real_api(test_project):
     """Test full scan with real API call."""
     # Run CLI
     result = subprocess.run(
-        ["uv", "run", "claude-lint", "--full", "--json"],
+        ["uv", "run", "lint-claude", "--full", "--json"],
         cwd=test_project,
         capture_output=True,
         text=True,
@@ -52,7 +52,7 @@ def test_full_scan_without_api_key(test_project, monkeypatch):
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
 
     result = subprocess.run(
-        ["uv", "run", "claude-lint", "--full"], cwd=test_project, capture_output=True, text=True
+        ["uv", "run", "lint-claude", "--full"], cwd=test_project, capture_output=True, text=True
     )
 
     assert result.returncode == 2
@@ -67,7 +67,7 @@ def test_keyboard_interrupt_handling(test_project):
 
     # Start process
     proc = subprocess.Popen(
-        ["uv", "run", "claude-lint", "--full"],
+        ["uv", "run", "lint-claude", "--full"],
         cwd=test_project,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -92,7 +92,7 @@ def test_keyboard_interrupt_handling(test_project):
 def test_progress_bar_output(test_project):
     """Test that progress bar is shown."""
     result = subprocess.run(
-        ["uv", "run", "claude-lint", "--full"],
+        ["uv", "run", "lint-claude", "--full"],
         cwd=test_project,
         capture_output=True,
         text=True,
@@ -113,7 +113,7 @@ def test_cache_persistence(test_project):
 
     # First run
     result1 = subprocess.run(
-        ["uv", "run", "claude-lint", "--full", "--json"],
+        ["uv", "run", "lint-claude", "--full", "--json"],
         cwd=test_project,
         capture_output=True,
         text=True,
@@ -126,7 +126,7 @@ def test_cache_persistence(test_project):
 
     # Second run should be faster (uses cache)
     result2 = subprocess.run(
-        ["uv", "run", "claude-lint", "--full", "--json"],
+        ["uv", "run", "lint-claude", "--full", "--json"],
         cwd=test_project,
         capture_output=True,
         text=True,
@@ -143,9 +143,9 @@ def test_cache_persistence(test_project):
 def test_version_flag():
     """Test --version flag works."""
     result = subprocess.run(
-        ["uv", "run", "claude-lint", "--version"], capture_output=True, text=True
+        ["uv", "run", "lint-claude", "--version"], capture_output=True, text=True
     )
 
     assert result.returncode == 0
-    assert "claude-lint" in result.stdout
+    assert "lint-claude" in result.stdout
     assert "0.3.0" in result.stdout

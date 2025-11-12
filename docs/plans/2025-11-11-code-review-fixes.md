@@ -2,7 +2,7 @@
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
-**Goal:** Fix all critical, major, and minor issues identified in senior developer code review to make claude-lint production-ready.
+**Goal:** Fix all critical, major, and minor issues identified in senior developer code review to make lint-claude production-ready.
 
 **Architecture:** Refactor existing functional codebase to add proper logging, error handling, atomic file operations, consistent pattern matching, and improved CLI experience while maintaining the no-classes constraint.
 
@@ -65,13 +65,13 @@ Expected: FAIL with "No module named 'claude_lint.logging_config'"
 Create `src/claude_lint/logging_config.py`:
 
 ```python
-"""Logging configuration for claude-lint."""
+"""Logging configuration for lint-claude."""
 import logging
 import sys
 
 
 def setup_logging(verbose: bool = False, quiet: bool = False) -> None:
-    """Configure logging for claude-lint.
+    """Configure logging for lint-claude.
 
     Args:
         verbose: Enable verbose (INFO level) logging
@@ -1097,7 +1097,7 @@ def test_config_model_default():
 def test_load_config_with_model():
     """Test loading config with custom model."""
     with tempfile.TemporaryDirectory() as tmpdir:
-        config_file = Path(tmpdir) / ".agent-lint.json"
+        config_file = Path(tmpdir) / ".lint-claude.json"
         config_file.write_text(json.dumps({
             "model": "claude-opus-4-5-20250929"
         }))
@@ -1118,7 +1118,7 @@ Modify `src/claude_lint/config.py`:
 ```python
 @dataclass
 class Config:
-    """Configuration for claude-lint."""
+    """Configuration for lint-claude."""
     include: list[str]
     exclude: list[str]
     batch_size: int
@@ -1149,7 +1149,7 @@ def load_config(config_path: Path) -> Config:
     """Load configuration from file or return defaults.
 
     Args:
-        config_path: Path to .agent-lint.json file
+        config_path: Path to .lint-claude.json file
 
     Returns:
         Config object with loaded or default values
@@ -1274,7 +1274,7 @@ git commit -m "feat: make Claude model configurable
 
 - Add model field to Config with default
 - Pass model to API client from config
-- Support 'model' in .agent-lint.json
+- Support 'model' in .lint-claude.json
 - Allows using different Claude models (opus, sonnet, etc.)"
 ```
 
@@ -1922,7 +1922,7 @@ def test_version_flag():
     result = runner.invoke(main, ['--version'])
 
     assert result.exit_code == 0
-    assert 'claude-lint' in result.output
+    assert 'lint-claude' in result.output
     assert '0.1.0' in result.output
 
 
@@ -1947,7 +1947,7 @@ Expected: FAIL - no version flag
 Create `src/claude_lint/__version__.py`:
 
 ```python
-"""Version information for claude-lint."""
+"""Version information for lint-claude."""
 
 __version__ = "0.1.0"
 ```
@@ -1964,7 +1964,7 @@ from claude_lint.__version__ import __version__
 Add version option:
 ```python
 @click.command()
-@click.version_option(version=__version__, prog_name='claude-lint')
+@click.version_option(version=__version__, prog_name='lint-claude')
 @click.option("--full", is_flag=True, help="Full project scan")
 ```
 
@@ -1974,7 +1974,7 @@ Modify `pyproject.toml`:
 
 ```toml
 [project]
-name = "claude-lint"
+name = "lint-claude"
 version = "0.1.0"
 description = "CLAUDE.md compliance checker using Claude API"
 ```
@@ -1986,10 +1986,10 @@ Expected: PASS
 
 **Step 7: Test CLI manually**
 
-Run: `uv run claude-lint --version`
+Run: `uv run lint-claude --version`
 Expected: Output showing version
 
-Run: `uv run claude-lint --help`
+Run: `uv run lint-claude --help`
 Expected: Help output showing all flags
 
 **Step 8: Commit**
@@ -2086,7 +2086,7 @@ Modify `src/claude_lint/config.py`:
 ```python
 @dataclass
 class Config:
-    """Configuration for claude-lint."""
+    """Configuration for lint-claude."""
     include: list[str]
     exclude: list[str]
     batch_size: int
@@ -2215,7 +2215,7 @@ git commit -m "feat: add file size limits to prevent API overload
 Create `src/claude_lint/types.py`:
 
 ```python
-"""Type definitions for claude-lint."""
+"""Type definitions for lint-claude."""
 from typing import TypedDict, Optional
 
 
@@ -2423,7 +2423,7 @@ from claude_lint.config import load_config
 def test_load_config_snake_case():
     """Test loading config with snake_case keys."""
     with tempfile.TemporaryDirectory() as tmpdir:
-        config_file = Path(tmpdir) / ".agent-lint.json"
+        config_file = Path(tmpdir) / ".lint-claude.json"
         config_file.write_text(json.dumps({
             "batch_size": 20,
             "max_file_size_mb": 2.0,
@@ -2440,7 +2440,7 @@ def test_load_config_snake_case():
 def test_load_config_backwards_compat_camel_case():
     """Test that camelCase is still supported for backwards compatibility."""
     with tempfile.TemporaryDirectory() as tmpdir:
-        config_file = Path(tmpdir) / ".agent-lint.json"
+        config_file = Path(tmpdir) / ".lint-claude.json"
         config_file.write_text(json.dumps({
             "batchSize": 20,
             "maxFileSizeMb": 2.0,
@@ -2470,7 +2470,7 @@ def load_config(config_path: Path) -> Config:
     Supports both snake_case (preferred) and camelCase (backwards compat) keys.
 
     Args:
-        config_path: Path to .agent-lint.json file
+        config_path: Path to .lint-claude.json file
 
     Returns:
         Config object with loaded or default values
@@ -2569,7 +2569,7 @@ Add Configuration section:
 ```markdown
 ## Configuration
 
-Create `.agent-lint.json` in your project root:
+Create `.lint-claude.json` in your project root:
 
 ```json
 {
@@ -2598,7 +2598,7 @@ Create `docs/TROUBLESHOOTING.md`:
 
 **Error:** `ValueError: API key is required`
 
-**Solution:** Set the `ANTHROPIC_API_KEY` environment variable or add `api_key` to `.agent-lint.json`:
+**Solution:** Set the `ANTHROPIC_API_KEY` environment variable or add `api_key` to `.lint-claude.json`:
 
 ```bash
 export ANTHROPIC_API_KEY="sk-ant-..."
@@ -2643,7 +2643,7 @@ export ANTHROPIC_API_KEY="sk-ant-..."
 **Solution:** Delete cache and progress files:
 
 ```bash
-rm .agent-lint-cache.json .agent-lint-progress.json
+rm .lint-claude-cache.json .lint-claude-progress.json
 ```
 
 Claude-lint will rebuild the cache on next run.
@@ -2669,7 +2669,7 @@ Claude-lint will rebuild the cache on next run.
 Run with `--verbose` for detailed logging:
 
 ```bash
-claude-lint --full --verbose
+lint-claude --full --verbose
 ```
 
 This shows:
@@ -2683,7 +2683,7 @@ This shows:
 1. Check this troubleshooting guide
 2. Review [Architecture docs](ARCHITECTURE.md)
 3. Run with `--verbose` for detailed output
-4. File an issue at https://github.com/vtemian/claude-lint/issues
+4. File an issue at https://github.com/vtemian/lint-claude/issues
 ```
 
 **Step 3: Create architecture documentation**
@@ -2899,10 +2899,10 @@ Expected: No linting errors
 
 **Step 4: Test CLI commands manually**
 
-Run: `uv run claude-lint --version`
+Run: `uv run lint-claude --version`
 Expected: Version output
 
-Run: `uv run claude-lint --help`
+Run: `uv run lint-claude --help`
 Expected: Help with all options
 
 **Step 5: Create summary of changes**
@@ -2968,7 +2968,7 @@ git commit -m "docs: add changelog for v0.2.0"
 
 Modify `src/claude_lint/__version__.py`:
 ```python
-"""Version information for claude-lint."""
+"""Version information for lint-claude."""
 
 __version__ = "0.2.0"
 ```

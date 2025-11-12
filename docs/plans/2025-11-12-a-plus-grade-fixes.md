@@ -746,7 +746,7 @@ Expected: PASS - all CLI tests pass
 
 **Step 5: Test mutually exclusive behavior manually**
 
-Run: `uv run claude-lint --full --diff main`
+Run: `uv run lint-claude --full --diff main`
 
 Expected: Error message about mutual exclusivity
 

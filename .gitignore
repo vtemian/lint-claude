@@ -1,7 +1,10 @@
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
+
+# Distribution / packaging
 .Python
 build/
 develop-eggs/
@@ -18,9 +21,49 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-.pytest_cache/
-.coverage
-htmlcov/
-.agent-lint-cache.json
+MANIFEST
+
+# Virtual environments
 .venv/
 venv/
+env/
+ENV/
+
+# Testing
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.hypothesis/
+
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pytype/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Claude-lint runtime files
+.agent-lint-cache.json
+.agent-lint-progress.json
+
+# Environment variables (IMPORTANT: Never commit API keys!)
+.env
+.env.local
+.env.*.local
+
+# Config with secrets (if API key is stored)
+# Uncomment if you store API key in config:
+# .agent-lint.json
+
+# UV
+.uv/
+uv.lock  # Optional: some projects commit this, others don't

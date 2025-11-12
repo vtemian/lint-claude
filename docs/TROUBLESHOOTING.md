@@ -6,7 +6,7 @@
 
 **Error:** `ValueError: API key is required`
 
-**Solution:** Set the `ANTHROPIC_API_KEY` environment variable or add `api_key` to `.agent-lint.json`:
+**Solution:** Set the `ANTHROPIC_API_KEY` environment variable or add `api_key` to `.lint-claude.json`:
 
 ```bash
 export ANTHROPIC_API_KEY="sk-ant-..."
@@ -51,7 +51,7 @@ export ANTHROPIC_API_KEY="sk-ant-..."
 **Solution:** Delete cache and progress files:
 
 ```bash
-rm .agent-lint-cache.json .agent-lint-progress.json
+rm .lint-claude-cache.json .lint-claude-progress.json
 ```
 
 Claude-lint will rebuild the cache on next run.
@@ -77,7 +77,7 @@ Claude-lint will rebuild the cache on next run.
 Run with `--verbose` for detailed logging:
 
 ```bash
-claude-lint --full --verbose
+lint-claude --full --verbose
 ```
 
 This shows:
@@ -91,4 +91,4 @@ This shows:
 1. Check this troubleshooting guide
 2. Review [Architecture docs](ARCHITECTURE.md)
 3. Run with `--verbose` for detailed output
-4. File an issue at https://github.com/vtemian/claude-lint/issues
+4. File an issue at https://github.com/vtemian/lint-claude/issues

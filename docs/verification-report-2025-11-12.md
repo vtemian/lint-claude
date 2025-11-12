@@ -1,6 +1,6 @@
 # Verification Report: 90+ Grade Production Readiness
 **Date:** 2025-11-12
-**Project:** claude-lint v0.3.0
+**Project:** lint-claude v0.3.0
 **Plan:** 2025-11-12-90-plus-grade-fixes.md
 
 ## Executive Summary
@@ -324,7 +324,7 @@ All critical and important issues resolved:
 
 **Status: ✅ SUCCESS - All targets achieved**
 
-The claude-lint project has successfully achieved A- grade (91/100) production readiness:
+The lint-claude project has successfully achieved A- grade (91/100) production readiness:
 
 - **Tests:** 147/150 passing (100% of runnable tests)
 - **Coverage:** 91% overall (target: 90%+)

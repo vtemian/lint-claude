@@ -617,7 +617,7 @@ def validate_api_key(api_key: str | None) -> None:
     if not api_key or not api_key.strip():
         raise ValueError(
             "API key is required. Set ANTHROPIC_API_KEY environment variable "
-            "or add 'api_key' to .agent-lint.json"
+            "or add 'api_key' to .lint-claude.json"
         )
 
     key = api_key.strip()
@@ -681,7 +681,7 @@ Prevents cryptic API errors from malformed keys"
 Create `src/claude_lint/constants.py`:
 
 ```python
-"""Configuration constants for claude-lint.
+"""Configuration constants for lint-claude.
 
 This module centralizes magic numbers used throughout the codebase
 with clear documentation for why each value was chosen.
@@ -1094,7 +1094,7 @@ def _process_all_batches(
 
             progress_state_updated = update_progress(progress_state, batch_idx, batch_results)
             save_progress(progress_state_updated, progress_path)
-            save_cache(cache, cache_path := project_root / ".agent-lint-cache.json")
+            save_cache(cache, cache_path := project_root / ".lint-claude-cache.json")
 
             yield batch_results
 
@@ -1205,10 +1205,10 @@ maintainers = [
 ```toml
 # pyproject.toml:49-52
 [project.urls]
-Homepage = "https://github.com/vtemian/claude-lint"
-Repository = "https://github.com/vtemian/claude-lint"
-Issues = "https://github.com/vtemian/claude-lint/issues"
-Documentation = "https://github.com/vtemian/claude-lint/blob/main/README.md"
+Homepage = "https://github.com/vtemian/lint-claude"
+Repository = "https://github.com/vtemian/lint-claude"
+Issues = "https://github.com/vtemian/lint-claude/issues"
+Documentation = "https://github.com/vtemian/lint-claude/blob/main/README.md"
 ```
 
 **Step 3: Verify pyproject.toml is valid**
@@ -1224,7 +1224,7 @@ git add pyproject.toml
 git commit -m "fix: update package metadata for PyPI publication
 
 - Replace placeholder author with Vlad Temian
-- Update homepage URL to vtemian/claude-lint
+- Update homepage URL to vtemian/lint-claude
 - Add repository, issues, and documentation URLs
 
 Package now ready for PyPI publication"

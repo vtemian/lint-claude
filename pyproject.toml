@@ -1,7 +1,7 @@
 [project]
-name = "claude-lint"
+name = "lint-claude"
 version = "0.3.0"
-description = "CLAUDE.md compliance checker using Claude API"
+description = "Enforce your CLAUDE.md guidelines using Claude AI - intelligent linting for agent instructions"
 readme = "README.md"
 requires-python = ">=3.11"
 license = {text = "MIT"}
@@ -12,12 +12,14 @@ maintainers = [
     {name = "Vlad Temian", email = "vladtemian@gmail.com"},
 ]
 keywords = [
-    "claude",
+    "ai-agent",
     "linter",
     "code-quality",
-    "ai",
     "compliance",
+    "claude",
+    "anthropic",
     "static-analysis",
+    "guidelines",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -47,14 +49,14 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/vtemian/claude-lint"
-Documentation = "https://github.com/vtemian/claude-lint/blob/main/README.md"
-Repository = "https://github.com/vtemian/claude-lint"
-Issues = "https://github.com/vtemian/claude-lint/issues"
-Changelog = "https://github.com/vtemian/claude-lint/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/vtemian/lint-claude"
+Documentation = "https://github.com/vtemian/lint-claude/blob/main/README.md"
+Repository = "https://github.com/vtemian/lint-claude"
+Issues = "https://github.com/vtemian/lint-claude/issues"
+Changelog = "https://github.com/vtemian/lint-claude/blob/main/CHANGELOG.md"
 
 [project.scripts]
-claude-lint = "claude_lint.cli:main"
+lint-claude = "claude_lint.cli:main"
 
 [build-system]
 requires = ["setuptools>=68.0"]
