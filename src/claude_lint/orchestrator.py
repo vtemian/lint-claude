@@ -206,11 +206,8 @@ def run_compliance_check(
     progress_state = init_or_load_progress(progress_path, len(batches))
 
     # Create API client once for all batches
-    if api_key is None:
-        raise ValueError(
-            "API key is required but was None after validation. "
-            "This indicates a bug in validate_api_key()."
-        )
+    # Type narrowing: validate_api_key() ensures api_key is str (not None)
+    assert api_key is not None  # For mypy type narrowing only
     client = create_client(api_key, timeout=config.api_timeout_seconds)
 
     # Create rate limiter for API calls
