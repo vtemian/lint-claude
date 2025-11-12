@@ -171,7 +171,9 @@ Use `snake_case` (preferred) or `camelCase` for keys.
 
 `lint-claude` returns exit code `0` for clean scans and `1` when violations are found, making it perfect for CI/CD.
 
-### GitHub Actions
+### GitHub Action (Recommended)
+
+Use the official GitHub Action for the easiest integration:
 
 ```yaml
 name: CLAUDE.md Compliance
@@ -184,7 +186,89 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Need full history for --diff
+          fetch-depth: 0  # Need full history for diff mode
+
+      - name: Lint CLAUDE.md
+        uses: vtemian/lint-claude@v0.3.1
+        with:
+          mode: 'diff'
+          base-branch: 'origin/main'
+          anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
+```
+
+#### Action Inputs
+
+| Input | Description | Default |
+|-------|-------------|---------|
+| `mode` | Scan mode: `full`, `diff`, `working`, `staged` | `diff` |
+| `base-branch` | Base branch for diff mode | `origin/main` |
+| `anthropic-api-key` | API key (uses `ANTHROPIC_API_KEY` secret if not set) | - |
+| `fail-on-violations` | Fail workflow if violations found | `true` |
+| `output-format` | Output format: `text` or `json` | `text` |
+
+#### Action Outputs
+
+| Output | Description |
+|--------|-------------|
+| `violations-found` | Whether violations were found (`true`/`false`) |
+| `summary` | Summary of violations |
+
+#### More Examples
+
+**Full project scan:**
+```yaml
+- uses: vtemian/lint-claude@v0.3.1
+  with:
+    mode: 'full'
+```
+
+**Comment violations on PR:**
+```yaml
+- name: Lint changed files
+  id: lint
+  uses: vtemian/lint-claude@v0.3.1
+  with:
+    mode: 'diff'
+    fail-on-violations: 'false'
+
+- name: Comment on PR
+  if: steps.lint.outputs.violations-found == 'true'
+  uses: actions/github-script@v7
+  with:
+    script: |
+      github.rest.issues.createComment({
+        issue_number: context.issue.number,
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        body: `## ⚠️ CLAUDE.md Violations\n\n${{ steps.lint.outputs.summary }}`
+      });
+```
+
+**Check staged files only:**
+```yaml
+- uses: vtemian/lint-claude@v0.3.1
+  with:
+    mode: 'staged'
+```
+
+See [example workflows](.github/workflows/examples/) for more.
+
+### Using uvx (Alternative)
+
+If you prefer running the CLI directly:
+
+```yaml
+name: CLAUDE.md Compliance
+
+on: [pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Check guidelines
         env:

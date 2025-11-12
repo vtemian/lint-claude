@@ -1,0 +1,116 @@
+name: 'Lint Claude'
+description: 'Enforce your CLAUDE.md guidelines using Claude AI'
+author: 'Vlad Temian'
+
+branding:
+  icon: 'check-circle'
+  color: 'blue'
+
+inputs:
+  mode:
+    description: 'Scan mode: full, diff, working, or staged'
+    required: false
+    default: 'diff'
+  base-branch:
+    description: 'Base branch for diff mode (e.g., main, origin/main)'
+    required: false
+    default: 'origin/main'
+  anthropic-api-key:
+    description: 'Anthropic API key (defaults to ANTHROPIC_API_KEY secret)'
+    required: false
+  fail-on-violations:
+    description: 'Fail the workflow if violations are found'
+    required: false
+    default: 'true'
+  config-file:
+    description: 'Path to .agent-lint.json config file'
+    required: false
+    default: '.agent-lint.json'
+  output-format:
+    description: 'Output format: text or json'
+    required: false
+    default: 'text'
+
+outputs:
+  violations-found:
+    description: 'Whether violations were found (true/false)'
+    value: ${{ steps.lint.outputs.violations-found }}
+  summary:
+    description: 'Summary of violations'
+    value: ${{ steps.lint.outputs.summary }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
+
+    - name: Set up Python
+      shell: bash
+      run: uv python install 3.11
+
+    - name: Run lint-claude
+      id: lint
+      shell: bash
+      env:
+        ANTHROPIC_API_KEY: ${{ inputs.anthropic-api-key || env.ANTHROPIC_API_KEY }}
+      run: |
+        set +e  # Don't exit on error
+
+        # Build command
+        CMD="uvx lint-claude"
+
+        # Add mode
+        case "${{ inputs.mode }}" in
+          full)
+            CMD="$CMD --full"
+            ;;
+          diff)
+            CMD="$CMD --diff ${{ inputs.base-branch }}"
+            ;;
+          working)
+            CMD="$CMD --working"
+            ;;
+          staged)
+            CMD="$CMD --staged"
+            ;;
+          *)
+            echo "Error: Invalid mode '${{ inputs.mode }}'. Must be: full, diff, working, or staged"
+            exit 1
+            ;;
+        esac
+
+        # Add output format
+        if [ "${{ inputs.output-format }}" = "json" ]; then
+          CMD="$CMD --json"
+        fi
+
+        # Run the command
+        echo "Running: $CMD"
+        OUTPUT=$($CMD 2>&1)
+        EXIT_CODE=$?
+
+        echo "$OUTPUT"
+
+        # Set outputs
+        if [ $EXIT_CODE -eq 0 ]; then
+          echo "violations-found=false" >> $GITHUB_OUTPUT
+          echo "summary=No violations found" >> $GITHUB_OUTPUT
+        else
+          echo "violations-found=true" >> $GITHUB_OUTPUT
+
+          # Extract summary from output
+          SUMMARY=$(echo "$OUTPUT" | grep -A 10 "Summary:" | head -20 || echo "Violations found")
+          echo "summary<<EOF" >> $GITHUB_OUTPUT
+          echo "$SUMMARY" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        fi
+
+        # Fail if configured to fail on violations
+        if [ "${{ inputs.fail-on-violations }}" = "true" ] && [ $EXIT_CODE -ne 0 ]; then
+          exit $EXIT_CODE
+        fi
+
+        exit 0

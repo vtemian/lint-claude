@@ -1,0 +1,20 @@
+name: Lint CLAUDE.md on PR
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-claude:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Need full history for diff mode
+
+      - name: Lint changed files
+        uses: vtemian/lint-claude@v0.3.1
+        with:
+          mode: 'diff'
+          base-branch: 'origin/main'
+          anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
