@@ -4,8 +4,10 @@ version = "0.2.0"
 description = "CLAUDE.md compliance checker using Claude API"
 requires-python = ">=3.11"
 dependencies = [
-    "anthropic>=0.18.0",
+    "anthropic>=0.18.0,<0.50",
     "click>=8.1.0",
+    "rich>=13.0.0",
+    "pydantic>=2.0.0,<3.0",
 ]
 
 [project.optional-dependencies]
