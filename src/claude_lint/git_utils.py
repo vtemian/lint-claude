@@ -1,6 +1,6 @@
 """Git integration utilities."""
-from pathlib import Path
 import subprocess
+from pathlib import Path
 
 # Timeout for git operations in seconds
 GIT_TIMEOUT = 30

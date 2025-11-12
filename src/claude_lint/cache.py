@@ -1,6 +1,6 @@
 """Cache management for file analysis results."""
 import json
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
 
 from claude_lint.file_utils import atomic_write_json
@@ -38,9 +38,9 @@ def load_cache(cache_path: Path) -> Cache:
         return Cache(claude_md_hash="", entries={})
 
     try:
-        with open(cache_path, encoding="utf-8") as f:
+        with cache_path.open(encoding="utf-8") as f:
             data = json.load(f)
-    except (json.JSONDecodeError, IOError):
+    except (OSError, json.JSONDecodeError):
         return Cache(claude_md_hash="", entries={})
 
     entries = {}

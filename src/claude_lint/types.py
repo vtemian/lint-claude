@@ -1,5 +1,5 @@
 """Type definitions for claude-lint."""
-from typing import TypedDict, Optional
+from typing import TypedDict
 
 
 class Violation(TypedDict):
@@ -7,7 +7,7 @@ class Violation(TypedDict):
 
     type: str
     message: str
-    line: Optional[int]
+    line: int | None
 
 
 class FileResult(TypedDict):

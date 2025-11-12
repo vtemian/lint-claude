@@ -1,12 +1,12 @@
 """File reading with encoding fallback and size limits."""
 from pathlib import Path
-from typing import Optional
+
 from claude_lint.logging_config import get_logger
 
 logger = get_logger(__name__)
 
 
-def read_file_safely(file_path: Path, project_root: Path, max_size_bytes: int) -> Optional[str]:
+def read_file_safely(file_path: Path, project_root: Path, max_size_bytes: int) -> str | None:
     """Read file with encoding fallback and size checking.
 
     Tries UTF-8 first, falls back to latin-1. Checks file size before reading.

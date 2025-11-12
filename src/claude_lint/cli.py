@@ -1,13 +1,14 @@
 """Command-line interface for claude-lint."""
 import sys
 from pathlib import Path
+
 import click
 
 from claude_lint.__version__ import __version__
 from claude_lint.config import load_config
-from claude_lint.logging_config import setup_logging, get_logger
+from claude_lint.logging_config import get_logger, setup_logging
 from claude_lint.orchestrator import run_compliance_check
-from claude_lint.reporter import get_exit_code, format_detailed_report, format_json_report
+from claude_lint.reporter import format_detailed_report, format_json_report, get_exit_code
 
 
 @click.command()

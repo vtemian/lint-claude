@@ -90,13 +90,13 @@ def compute_file_hash(file_path: Path) -> str:
     hash_obj = hashlib.sha256()
     try:
         # Try reading as text first
-        with open(file_path, "rb") as f:
+        with file_path.open("rb") as f:
             # Read in chunks to handle large files efficiently
             for chunk in iter(lambda: f.read(65536), b""):
                 hash_obj.update(chunk)
-    except (OSError, IOError) as e:
+    except OSError as e:
         # Handle file read errors
-        raise IOError(f"Failed to read file {file_path}: {e}") from e
+        raise OSError(f"Failed to read file {file_path}: {e}") from e
 
     return hash_obj.hexdigest()
 

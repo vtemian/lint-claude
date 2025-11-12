@@ -1,7 +1,9 @@
 """Batch processing logic."""
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
 from anthropic import Anthropic
+
 from claude_lint.api_client import analyze_files_with_client
 from claude_lint.cache import Cache, CacheEntry
 from claude_lint.collector import compute_file_hash
@@ -11,7 +13,9 @@ from claude_lint.logging_config import get_logger
 from claude_lint.processor import build_xml_prompt, parse_response
 from claude_lint.rate_limiter import RateLimiter
 from claude_lint.retry import retry_with_backoff
-from claude_lint.types import FileResult
+
+if TYPE_CHECKING:
+    from claude_lint.types import FileResult
 
 logger = get_logger(__name__)
 

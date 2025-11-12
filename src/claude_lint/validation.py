@@ -1,7 +1,5 @@
 """Input validation functions."""
 from pathlib import Path
-from typing import Optional
-
 
 VALID_MODES = {"full", "diff", "working", "staged"}
 
@@ -48,7 +46,7 @@ def validate_batch_size(batch_size: int) -> None:
         raise ValueError(f"Batch size must be positive, got: {batch_size}")
 
 
-def validate_api_key(api_key: Optional[str]) -> None:
+def validate_api_key(api_key: str | None) -> None:
     """Validate API key.
 
     Args:

@@ -1,6 +1,6 @@
 """Progress tracking and resume capability."""
 import json
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -68,7 +68,7 @@ def load_progress(progress_file: Path) -> ProgressState:
     Returns:
         ProgressState with loaded data
     """
-    with open(progress_file) as f:
+    with progress_file.open() as f:
         data = json.load(f)
 
     return ProgressState(**data)

@@ -2,8 +2,8 @@
 import json
 from typing import Any
 
-from claude_lint.types import FileResult
 from claude_lint.metrics import AnalysisMetrics
+from claude_lint.types import FileResult
 
 
 def format_detailed_report(results: list[dict[str, Any]], metrics: AnalysisMetrics) -> str:

@@ -1,7 +1,9 @@
 """Retry logic with exponential backoff."""
 import random
 import time
-from typing import Callable, TypeVar
+from collections.abc import Callable
+from typing import TypeVar
+
 from claude_lint.logging_config import get_logger
 
 T = TypeVar("T")

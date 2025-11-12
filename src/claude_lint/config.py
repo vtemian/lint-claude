@@ -1,7 +1,7 @@
 """Configuration management for claude-lint."""
 import json
 from pathlib import Path
-from typing import Optional
+
 from pydantic import BaseModel, Field, field_validator
 
 
@@ -21,7 +21,7 @@ class Config(BaseModel):
         default=1.0, gt=0, description="Rate limit window in seconds"
     )
     show_progress: bool = Field(default=True, description="Show progress bars")
-    api_key: Optional[str] = Field(default=None, description="Anthropic API key")
+    api_key: str | None = Field(default=None, description="Anthropic API key")
 
     @field_validator("include")
     @classmethod
@@ -74,7 +74,7 @@ def load_config(config_path: Path) -> Config:
     if not config_path.exists():
         return get_default_config()
 
-    with open(config_path, encoding="utf-8") as f:
+    with config_path.open(encoding="utf-8") as f:
         data = json.load(f)
 
     defaults = get_default_config()

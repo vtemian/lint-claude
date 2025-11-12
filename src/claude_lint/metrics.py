@@ -1,7 +1,6 @@
 """Metrics and telemetry tracking."""
 import time
 from dataclasses import dataclass, field
-from typing import Optional
 
 
 @dataclass
@@ -10,7 +9,7 @@ class AnalysisMetrics:
 
     # Timing
     start_time: float = field(default_factory=time.time)
-    end_time: Optional[float] = None
+    end_time: float | None = None
 
     # Files
     total_files_collected: int = 0

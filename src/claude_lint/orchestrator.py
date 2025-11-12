@@ -1,46 +1,46 @@
 """Main orchestrator coordinating all components."""
 import os
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from claude_lint.api_client import create_client
+from claude_lint.batch_processor import process_batch
 from claude_lint.cache import Cache, load_cache, save_cache
-from claude_lint.collector import collect_all_files, filter_files_by_list, compute_file_hash
+from claude_lint.collector import collect_all_files, compute_file_hash, filter_files_by_list
 from claude_lint.config import Config
 from claude_lint.git_utils import (
-    is_git_repo,
     get_changed_files_from_branch,
-    get_working_directory_files,
     get_staged_files,
+    get_working_directory_files,
+    is_git_repo,
 )
-from claude_lint.guidelines import read_claude_md, get_claude_md_hash
+from claude_lint.guidelines import get_claude_md_hash, read_claude_md
 from claude_lint.logging_config import get_logger
 from claude_lint.metrics import AnalysisMetrics
 from claude_lint.processor import create_batches
-from claude_lint.rate_limiter import RateLimiter
-from claude_lint.batch_processor import process_batch
 from claude_lint.progress import (
+    ProgressState,
+    cleanup_progress,
     create_progress_state,
-    update_progress,
-    save_progress,
-    load_progress,
     get_remaining_batch_indices,
     is_progress_complete,
-    cleanup_progress,
-    ProgressState,
+    load_progress,
+    save_progress,
+    update_progress,
 )
+from claude_lint.rate_limiter import RateLimiter
 from claude_lint.validation import (
-    validate_project_root,
-    validate_mode,
-    validate_batch_size,
     validate_api_key,
+    validate_batch_size,
+    validate_mode,
+    validate_project_root,
 )
 
 logger = get_logger(__name__)
 
 
 def run_compliance_check(
-    project_root: Path, config: Config, mode: str = "full", base_branch: Optional[str] = None
+    project_root: Path, config: Config, mode: str = "full", base_branch: str | None = None
 ) -> tuple[list[dict[str, Any]], AnalysisMetrics]:
     """Run compliance check.
 
@@ -124,7 +124,7 @@ def run_compliance_check(
     remaining_batches = list(get_remaining_batch_indices(progress_state))
 
     if show_progress:
-        from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn
+        from rich.progress import BarColumn, Progress, SpinnerColumn, TaskProgressColumn, TextColumn
 
         with Progress(
             SpinnerColumn(),
@@ -198,7 +198,7 @@ def run_compliance_check(
 
 
 def collect_files_for_mode(
-    project_root: Path, config: Config, mode: str, base_branch: Optional[str]
+    project_root: Path, config: Config, mode: str, base_branch: str | None
 ) -> list[Path]:
     """Collect files based on mode.
 

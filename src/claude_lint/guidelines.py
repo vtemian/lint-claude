@@ -1,10 +1,9 @@
 """CLAUDE.md guidelines reader and hash tracker."""
 import hashlib
 from pathlib import Path
-from typing import Optional
 
 
-def read_claude_md(project_root: Path, fallback_home: Optional[Path] = None) -> str:
+def read_claude_md(project_root: Path, fallback_home: Path | None = None) -> str:
     """Read CLAUDE.md from project root or ~/.claude/ fallback.
 
     Args:
