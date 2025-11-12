@@ -2,7 +2,34 @@
 name = "claude-lint"
 version = "0.3.0"
 description = "CLAUDE.md compliance checker using Claude API"
+readme = "README.md"
 requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [
+    {name = "Your Name", email = "your.email@example.com"},
+]
+maintainers = [
+    {name = "Your Name", email = "your.email@example.com"},
+]
+keywords = [
+    "claude",
+    "linter",
+    "code-quality",
+    "ai",
+    "compliance",
+    "static-analysis",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Software Development :: Testing",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Typing :: Typed",
+]
 dependencies = [
     "anthropic>=0.18.0,<0.50",
     "click>=8.1.0,<9.0",
@@ -18,6 +45,13 @@ dev = [
     "mypy>=1.8.0,<2.0",
     "pre-commit>=3.5.0,<4.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/claude-lint"
+Documentation = "https://github.com/yourusername/claude-lint/blob/main/README.md"
+Repository = "https://github.com/yourusername/claude-lint"
+Issues = "https://github.com/yourusername/claude-lint/issues"
+Changelog = "https://github.com/yourusername/claude-lint/blob/main/CHANGELOG.md"
 
 [project.scripts]
 claude-lint = "claude_lint.cli:main"
