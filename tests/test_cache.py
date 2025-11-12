@@ -80,3 +80,30 @@ def test_cache_invalidation_on_claude_md_change():
     is_valid = entry.claude_md_hash == current_claude_hash
 
     assert not is_valid
+
+
+def test_cache_handles_non_ascii_content(tmp_path):
+    """Test that cache handles files with non-ASCII characters."""
+    cache = Cache(
+        claude_md_hash="hash123",
+        entries={
+            "café.py": CacheEntry(
+                file_hash="abc123",
+                claude_md_hash="hash123",
+                violations=[{
+                    "type": "style",
+                    "message": "Use café naming convention ☕",
+                    "line": 1
+                }],
+                timestamp=1234567890
+            )
+        }
+    )
+
+    cache_path = tmp_path / ".cache.json"
+    save_cache(cache, cache_path)
+
+    # Reload and verify
+    loaded = load_cache(cache_path)
+    assert "café.py" in loaded.entries
+    assert "café naming convention ☕" in loaded.entries["café.py"].violations[0]["message"]

@@ -36,7 +36,7 @@ def load_cache(cache_path: Path) -> Cache:
         return Cache(claude_md_hash="", entries={})
 
     try:
-        with open(cache_path) as f:
+        with open(cache_path, encoding='utf-8') as f:
             data = json.load(f)
     except (json.JSONDecodeError, IOError):
         return Cache(claude_md_hash="", entries={})

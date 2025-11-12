@@ -23,7 +23,7 @@ def atomic_write_json(data: Any, target_path: Path) -> None:
 
     try:
         # Write to temporary file
-        with open(tmp_path, 'w') as f:
+        with open(tmp_path, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=2)
 
         # Atomic replace (POSIX guarantees atomicity)
