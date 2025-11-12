@@ -6,10 +6,10 @@ readme = "README.md"
 requires-python = ">=3.11"
 license = {text = "MIT"}
 authors = [
-    {name = "Your Name", email = "your.email@example.com"},
+    {name = "Vlad Temian", email = "vladtemian@gmail.com"},
 ]
 maintainers = [
-    {name = "Your Name", email = "your.email@example.com"},
+    {name = "Vlad Temian", email = "vladtemian@gmail.com"},
 ]
 keywords = [
     "claude",
@@ -47,11 +47,11 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourusername/claude-lint"
-Documentation = "https://github.com/yourusername/claude-lint/blob/main/README.md"
-Repository = "https://github.com/yourusername/claude-lint"
-Issues = "https://github.com/yourusername/claude-lint/issues"
-Changelog = "https://github.com/yourusername/claude-lint/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/vtemian/claude-lint"
+Documentation = "https://github.com/vtemian/claude-lint/blob/main/README.md"
+Repository = "https://github.com/vtemian/claude-lint"
+Issues = "https://github.com/vtemian/claude-lint/issues"
+Changelog = "https://github.com/vtemian/claude-lint/blob/main/CHANGELOG.md"
 
 [project.scripts]
 claude-lint = "claude_lint.cli:main"
