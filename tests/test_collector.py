@@ -1,6 +1,5 @@
 import tempfile
 from pathlib import Path
-import pytest
 from claude_lint.collector import collect_all_files, filter_files_by_list, compute_file_hash
 from claude_lint.config import Config
 
@@ -19,11 +18,7 @@ def test_collect_files_with_patterns():
         (tmpdir / "node_modules").mkdir()
         (tmpdir / "node_modules" / "lib.js").write_text("js")
 
-        config = Config(
-            include=["**/*.py"],
-            exclude=["node_modules/**"],
-            batch_size=10
-        )
+        config = Config(include=["**/*.py"], exclude=["node_modules/**"], batch_size=10)
 
         files = collect_all_files(tmpdir, config)
 
@@ -45,11 +40,7 @@ def test_filter_by_file_list():
         (tmpdir / "file2.py").write_text("code")
         (tmpdir / "file3.py").write_text("code")
 
-        config = Config(
-            include=["**/*.py"],
-            exclude=[],
-            batch_size=10
-        )
+        config = Config(include=["**/*.py"], exclude=[], batch_size=10)
 
         # Filter to only specific files
         filtered = filter_files_by_list(tmpdir, ["file1.py", "file3.py"], config)
@@ -72,5 +63,6 @@ def test_compute_file_hash():
 
         # Hash should be consistent
         import hashlib
+
         expected = hashlib.sha256(content.encode()).hexdigest()
         assert file_hash == expected

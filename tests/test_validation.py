@@ -5,7 +5,7 @@ from claude_lint.validation import (
     validate_project_root,
     validate_mode,
     validate_batch_size,
-    validate_api_key
+    validate_api_key,
 )
 
 

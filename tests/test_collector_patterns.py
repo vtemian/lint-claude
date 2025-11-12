@@ -15,11 +15,7 @@ def test_pattern_matching_nested_double_star():
         (tmpdir / "lib" / "vendor" / "package").mkdir(parents=True)
         (tmpdir / "lib" / "vendor" / "package" / "file.py").write_text("code")
 
-        config = Config(
-            include=["**/*.py"],
-            exclude=["**/tests/**"],
-            batch_size=10
-        )
+        config = Config(include=["**/*.py"], exclude=["**/tests/**"], batch_size=10)
 
         files = collect_all_files(tmpdir, config)
         file_names = [f.name for f in files]
@@ -56,11 +52,7 @@ def test_pattern_matching_consistency():
         (tmpdir / "tests" / "test.py").write_text("code")
 
         # Include all .py, exclude tests - should use same matching
-        config = Config(
-            include=["**/*.py"],
-            exclude=["tests/**"],
-            batch_size=10
-        )
+        config = Config(include=["**/*.py"], exclude=["tests/**"], batch_size=10)
 
         files = collect_all_files(tmpdir, config)
         file_names = [f.name for f in files]

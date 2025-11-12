@@ -11,7 +11,7 @@ from claude_lint.reporter import get_exit_code, format_detailed_report, format_j
 
 
 @click.command()
-@click.version_option(version=__version__, prog_name='claude-lint')
+@click.version_option(version=__version__, prog_name="claude-lint")
 @click.option("--full", is_flag=True, help="Full project scan")
 @click.option("--diff", type=str, help="Check files changed from branch")
 @click.option("--working", is_flag=True, help="Check working directory changes")
@@ -20,7 +20,16 @@ from claude_lint.reporter import get_exit_code, format_detailed_report, format_j
 @click.option("--verbose", is_flag=True, help="Enable verbose logging")
 @click.option("--quiet", is_flag=True, help="Suppress warnings (errors only)")
 @click.option("--config", type=click.Path(exists=True), help="Path to config file")
-def main(full: bool, diff: str | None, working: bool, staged: bool, output_json: bool, verbose: bool, quiet: bool, config: str | None) -> None:
+def main(
+    full: bool,
+    diff: str | None,
+    working: bool,
+    staged: bool,
+    output_json: bool,
+    verbose: bool,
+    quiet: bool,
+    config: str | None,
+) -> None:
     """Claude-lint: CLAUDE.md compliance checker."""
     # Setup logging
     setup_logging(verbose=verbose, quiet=quiet)
@@ -82,9 +91,7 @@ def main(full: bool, diff: str | None, working: bool, staged: bool, output_json:
         logger = get_logger(__name__)
         logger.exception("Unexpected error during execution")
         click.echo(
-            f"An unexpected error occurred: {e}\n"
-            "Run with --verbose for details.",
-            err=True
+            f"An unexpected error occurred: {e}\n" "Run with --verbose for details.", err=True
         )
         sys.exit(2)
 

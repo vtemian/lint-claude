@@ -10,6 +10,7 @@ from claude_lint.types import Violation
 @dataclass
 class CacheEntry:
     """Cache entry for a single file."""
+
     file_hash: str
     claude_md_hash: str
     violations: list[Violation]
@@ -19,6 +20,7 @@ class CacheEntry:
 @dataclass
 class Cache:
     """Cache for analysis results."""
+
     claude_md_hash: str
     entries: dict[str, CacheEntry]
 
@@ -36,7 +38,7 @@ def load_cache(cache_path: Path) -> Cache:
         return Cache(claude_md_hash="", entries={})
 
     try:
-        with open(cache_path, encoding='utf-8') as f:
+        with open(cache_path, encoding="utf-8") as f:
             data = json.load(f)
     except (json.JSONDecodeError, IOError):
         return Cache(claude_md_hash="", entries={})
@@ -45,10 +47,7 @@ def load_cache(cache_path: Path) -> Cache:
     for file_path, entry_data in data.get("entries", {}).items():
         entries[file_path] = CacheEntry(**entry_data)
 
-    return Cache(
-        claude_md_hash=data.get("claudeMdHash", ""),
-        entries=entries
-    )
+    return Cache(claude_md_hash=data.get("claudeMdHash", ""), entries=entries)
 
 
 def save_cache(cache: Cache, cache_path: Path) -> None:
@@ -62,9 +61,6 @@ def save_cache(cache: Cache, cache_path: Path) -> None:
     for file_path, entry in cache.entries.items():
         entries_dict[file_path] = asdict(entry)
 
-    data = {
-        "claudeMdHash": cache.claude_md_hash,
-        "entries": entries_dict
-    }
+    data = {"claudeMdHash": cache.claude_md_hash, "entries": entries_dict}
 
     atomic_write_json(data, cache_path)

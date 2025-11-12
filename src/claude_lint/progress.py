@@ -10,6 +10,7 @@ from claude_lint.file_utils import atomic_write_json
 @dataclass
 class ProgressState:
     """State for progress tracking."""
+
     total_batches: int
     completed_batch_indices: list[int] = field(default_factory=list)
     results: list[dict[str, Any]] = field(default_factory=list)
@@ -28,9 +29,7 @@ def create_progress_state(total_batches: int) -> ProgressState:
 
 
 def update_progress(
-    state: ProgressState,
-    batch_index: int,
-    results: list[dict[str, Any]]
+    state: ProgressState, batch_index: int, results: list[dict[str, Any]]
 ) -> ProgressState:
     """Update progress with batch results.
 

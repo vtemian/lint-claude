@@ -25,18 +25,18 @@ def test_skip_large_files():
             exclude=[],
             batch_size=10,
             max_file_size_mb=1.0,  # 1MB limit
-            api_key="test-key"
+            api_key="test-key",
         )
 
-        with patch("claude_lint.orchestrator.analyze_files_with_client") as mock_api:
+        with patch("claude_lint.batch_processor.analyze_files_with_client") as mock_api:
             with patch("claude_lint.orchestrator.create_client") as mock_create:
                 mock_create.return_value = Mock()
                 mock_api.return_value = (
                     '{"results": [{"file": "small.py", "violations": []}]}',
-                    Mock()
+                    Mock(),
                 )
 
-                results = run_compliance_check(tmpdir, config, mode="full")
+                results, metrics = run_compliance_check(tmpdir, config, mode="full")
 
                 # Only small file should be analyzed
                 call_args = mock_api.call_args
@@ -49,5 +49,6 @@ def test_skip_large_files():
 def test_default_file_size_limit():
     """Test default file size limit."""
     from claude_lint.config import get_default_config
+
     config = get_default_config()
     assert config.max_file_size_mb == 1.0

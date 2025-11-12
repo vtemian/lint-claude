@@ -1,7 +1,7 @@
 import tempfile
 import json
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 import pytest
 from claude_lint.file_utils import atomic_write_json
 
@@ -33,7 +33,7 @@ def test_atomic_write_json_no_corruption_on_failure():
         target.write_text(json.dumps(original_data))
 
         # Mock json.dump to fail
-        with patch('json.dump', side_effect=RuntimeError("Write failed")):
+        with patch("json.dump", side_effect=RuntimeError("Write failed")):
             with pytest.raises(RuntimeError, match="Write failed"):
                 atomic_write_json({"new": "data"}, target)
 
@@ -50,7 +50,7 @@ def test_atomic_write_json_tmp_cleaned_up():
         target = tmpdir / "test.json"
 
         # Mock json.dump to fail
-        with patch('json.dump', side_effect=RuntimeError("Write failed")):
+        with patch("json.dump", side_effect=RuntimeError("Write failed")):
             with pytest.raises(RuntimeError):
                 atomic_write_json({"data": "value"}, target)
 

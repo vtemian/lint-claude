@@ -4,6 +4,7 @@ from claude_lint.retry import retry_with_backoff
 
 def test_retry_does_not_catch_keyboard_interrupt():
     """Test that KeyboardInterrupt is not caught by retry."""
+
     def failing_func():
         raise KeyboardInterrupt()
 
@@ -13,6 +14,7 @@ def test_retry_does_not_catch_keyboard_interrupt():
 
 def test_retry_does_not_catch_system_exit():
     """Test that SystemExit is not caught by retry."""
+
     def failing_func():
         raise SystemExit(1)
 

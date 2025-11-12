@@ -19,11 +19,11 @@ def atomic_write_json(data: Any, target_path: Path) -> None:
         ValueError: If data cannot be serialized
     """
     # Create temp file in same directory as target for atomic replace
-    tmp_path = target_path.with_suffix('.tmp')
+    tmp_path = target_path.with_suffix(".tmp")
 
     try:
         # Write to temporary file
-        with open(tmp_path, 'w', encoding='utf-8') as f:
+        with open(tmp_path, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2)
 
         # Atomic replace (POSIX guarantees atomicity)

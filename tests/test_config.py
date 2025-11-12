@@ -1,8 +1,7 @@
 import json
 import tempfile
 from pathlib import Path
-import pytest
-from claude_lint.config import Config, load_config
+from claude_lint.config import load_config
 
 
 def test_load_config_with_defaults():
@@ -22,11 +21,7 @@ def test_load_config_with_custom_values():
     """Test loading config with custom values."""
     with tempfile.TemporaryDirectory() as tmpdir:
         config_path = Path(tmpdir) / ".agent-lint.json"
-        config_data = {
-            "include": ["src/**/*.py"],
-            "exclude": ["tests/**"],
-            "batchSize": 5
-        }
+        config_data = {"include": ["src/**/*.py"], "exclude": ["tests/**"], "batchSize": 5}
         config_path.write_text(json.dumps(config_data))
 
         config = load_config(config_path)
@@ -47,6 +42,7 @@ def test_load_config_missing_file():
 def test_config_model_default():
     """Test default model configuration."""
     from claude_lint.config import get_default_config
+
     config = get_default_config()
     assert config.model == "claude-sonnet-4-5-20250929"
 
@@ -55,9 +51,7 @@ def test_load_config_with_model():
     """Test loading config with custom model."""
     with tempfile.TemporaryDirectory() as tmpdir:
         config_file = Path(tmpdir) / ".agent-lint.json"
-        config_file.write_text(json.dumps({
-            "model": "claude-opus-4-5-20250929"
-        }))
+        config_file.write_text(json.dumps({"model": "claude-opus-4-5-20250929"}))
 
         config = load_config(config_file)
         assert config.model == "claude-opus-4-5-20250929"

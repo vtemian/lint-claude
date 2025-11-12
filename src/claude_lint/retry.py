@@ -12,7 +12,7 @@ def retry_with_backoff(
     func: Callable[[], T],
     max_retries: int = 3,
     initial_delay: float = 1.0,
-    backoff_factor: float = 2.0
+    backoff_factor: float = 2.0,
 ) -> T:
     """Retry a function with exponential backoff and jitter.
 

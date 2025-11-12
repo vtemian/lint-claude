@@ -32,9 +32,7 @@ def validate_mode(mode: str) -> None:
         ValueError: If mode is not valid
     """
     if mode not in VALID_MODES:
-        raise ValueError(
-            f"Invalid mode: {mode}. Must be one of: {', '.join(sorted(VALID_MODES))}"
-        )
+        raise ValueError(f"Invalid mode: {mode}. Must be one of: {', '.join(sorted(VALID_MODES))}")
 
 
 def validate_batch_size(batch_size: int) -> None:

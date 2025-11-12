@@ -3,19 +3,22 @@ import os
 from pathlib import Path
 from typing import Any, Optional
 
-from claude_lint.api_client import create_client, analyze_files_with_client
-from claude_lint.cache import Cache, CacheEntry, load_cache, save_cache
+from claude_lint.api_client import create_client
+from claude_lint.cache import Cache, load_cache, save_cache
 from claude_lint.collector import collect_all_files, filter_files_by_list, compute_file_hash
 from claude_lint.config import Config
 from claude_lint.git_utils import (
     is_git_repo,
     get_changed_files_from_branch,
     get_working_directory_files,
-    get_staged_files
+    get_staged_files,
 )
 from claude_lint.guidelines import read_claude_md, get_claude_md_hash
 from claude_lint.logging_config import get_logger
-from claude_lint.processor import create_batches, parse_response, build_xml_prompt
+from claude_lint.metrics import AnalysisMetrics
+from claude_lint.processor import create_batches
+from claude_lint.rate_limiter import RateLimiter
+from claude_lint.batch_processor import process_batch
 from claude_lint.progress import (
     create_progress_state,
     update_progress,
@@ -24,26 +27,21 @@ from claude_lint.progress import (
     get_remaining_batch_indices,
     is_progress_complete,
     cleanup_progress,
-    ProgressState
+    ProgressState,
 )
-from claude_lint.retry import retry_with_backoff
-from claude_lint.types import FileResult
 from claude_lint.validation import (
     validate_project_root,
     validate_mode,
     validate_batch_size,
-    validate_api_key
+    validate_api_key,
 )
 
 logger = get_logger(__name__)
 
 
 def run_compliance_check(
-    project_root: Path,
-    config: Config,
-    mode: str = "full",
-    base_branch: Optional[str] = None
-) -> list[dict[str, Any]]:
+    project_root: Path, config: Config, mode: str = "full", base_branch: Optional[str] = None
+) -> tuple[list[dict[str, Any]], AnalysisMetrics]:
     """Run compliance check.
 
     Args:
@@ -53,11 +51,12 @@ def run_compliance_check(
         base_branch: Base branch for diff mode
 
     Returns:
-        List of results for all checked files
+        Tuple of (results list, metrics object)
 
     Raises:
         ValueError: If inputs are invalid
     """
+    metrics = AnalysisMetrics()
     # Input validation
     validate_project_root(project_root)
     validate_mode(mode)
@@ -79,21 +78,26 @@ def run_compliance_check(
     progress_path = project_root / ".agent-lint-progress.json"
 
     # Collect files to check
-    files_to_check = collect_files_for_mode(
-        project_root, config, mode, base_branch
-    )
+    files_to_check = collect_files_for_mode(project_root, config, mode, base_branch)
+
+    metrics.total_files_collected = len(files_to_check)
 
     if not files_to_check:
-        return []
+        metrics.finish()
+        return [], metrics
 
     # Filter using cache
-    files_needing_check = filter_cached_files(
-        files_to_check, cache, project_root, guidelines_hash
-    )
+    files_needing_check = filter_cached_files(files_to_check, cache, project_root, guidelines_hash)
+
+    metrics.files_from_cache = len(files_to_check) - len(files_needing_check)
+    metrics.cache_hits = metrics.files_from_cache
+    metrics.cache_misses = len(files_needing_check)
+    metrics.files_analyzed = len(files_needing_check)
 
     if not files_needing_check:
         # All files cached, return cached results
-        return get_cached_results(files_to_check, cache, project_root)
+        metrics.finish()
+        return get_cached_results(files_to_check, cache, project_root), metrics
 
     # Create batches
     batches = create_batches(files_needing_check, config.batch_size)
@@ -103,110 +107,98 @@ def run_compliance_check(
 
     # Create API client once for all batches
     assert api_key is not None  # Validated above
-    client = create_client(api_key)
+    client = create_client(api_key, timeout=config.api_timeout_seconds)
 
-    # Process batches
+    # Create rate limiter for API calls
+    rate_limiter = RateLimiter(
+        max_requests=config.api_rate_limit, window_seconds=config.api_rate_window_seconds
+    )
+
+    # Process batches with optional progress bar
+    # Note: Cache is saved after each batch to prevent data loss on crashes
     all_results = list(progress_state.results)  # Start with resumed results
 
-    for batch_idx in get_remaining_batch_indices(progress_state):
-        batch = batches[batch_idx]
+    # Determine if we should show progress
+    show_progress = config.show_progress and not os.environ.get("CLAUDE_LINT_NO_PROGRESS")
 
-        # Read file contents
-        file_contents = {}
-        max_size_bytes = int(config.max_file_size_mb * 1024 * 1024)
+    remaining_batches = list(get_remaining_batch_indices(progress_state))
 
-        for file_path in batch:
-            rel_path = file_path.relative_to(project_root)
+    if show_progress:
+        from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn
 
-            # Check file size
-            try:
-                file_size = file_path.stat().st_size
-                if file_size > max_size_bytes:
-                    logger.warning(
-                        f"File {rel_path} exceeds size limit "
-                        f"({file_size / 1024 / 1024:.2f}MB > "
-                        f"{config.max_file_size_mb}MB), skipping"
-                    )
-                    continue
-            except OSError as e:
-                logger.warning(f"Cannot stat file {rel_path}, skipping: {e}")
-                continue
-
-            try:
-                # Try UTF-8 first
-                content = file_path.read_text(encoding='utf-8')
-                file_contents[str(rel_path)] = content
-            except UnicodeDecodeError:
-                # Fall back to latin-1 which accepts all byte sequences
-                try:
-                    logger.warning(
-                        f"File {rel_path} is not valid UTF-8, trying latin-1"
-                    )
-                    content = file_path.read_text(encoding='latin-1')
-                    file_contents[str(rel_path)] = content
-                except Exception as e:
-                    logger.warning(
-                        f"Unable to decode file {rel_path}, skipping: {e}"
-                    )
-                    continue
-            except FileNotFoundError:
-                logger.warning(f"File not found, skipping: {rel_path}")
-                continue
-            except Exception as e:
-                logger.warning(f"Error reading file {rel_path}, skipping: {e}")
-                continue
-
-        # Build prompt
-        prompt = build_xml_prompt(guidelines, file_contents)
-
-        # Make API call with retry
-        def api_call():
-            response_text, response_obj = analyze_files_with_client(
-                client, guidelines, prompt, model=config.model
-            )
-            return response_text
-
-        response = retry_with_backoff(api_call)
-
-        # Parse results
-        batch_results: list[FileResult] = parse_response(response)
-        # Convert FileResult to dict for compatibility with progress state
-        batch_results_dict: list[dict[str, Any]] = [dict(r) for r in batch_results]
-        all_results.extend(batch_results_dict)
-
-        # Update cache
-        for result in batch_results:
-            file_path = project_root / result["file"]
-            file_hash = compute_file_hash(file_path)
-
-            cache.entries[result["file"]] = CacheEntry(
-                file_hash=file_hash,
-                claude_md_hash=guidelines_hash,
-                violations=result["violations"],
-                timestamp=int(Path(file_path).stat().st_mtime)
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[bold blue]{task.description}"),
+            BarColumn(),
+            TaskProgressColumn(),
+            TextColumn("[bold cyan]{task.fields[status]}"),
+        ) as progress:
+            task = progress.add_task(
+                "Analyzing files", total=len(remaining_batches), status="Starting..."
             )
 
-        # Save progress
-        progress_state = update_progress(progress_state, batch_idx, batch_results_dict)
-        save_progress(progress_state, progress_path)
-        save_cache(cache, cache_path)
+            for idx, batch_idx in enumerate(remaining_batches):
+                batch = batches[batch_idx]
+
+                progress.update(
+                    task, status=f"Batch {idx + 1}/{len(remaining_batches)} ({len(batch)} files)"
+                )
+
+                batch_results = process_batch(
+                    batch,
+                    project_root,
+                    config,
+                    guidelines,
+                    guidelines_hash,
+                    client,
+                    rate_limiter,
+                    cache,
+                )
+
+                all_results.extend(batch_results)
+                metrics.api_calls_made += 1
+
+                progress_state = update_progress(progress_state, batch_idx, batch_results)
+                save_progress(progress_state, progress_path)
+                save_cache(cache, cache_path)
+
+                progress.update(task, advance=1, status="Complete")
+    else:
+        # No progress bar
+        for batch_idx in remaining_batches:
+            batch = batches[batch_idx]
+
+            batch_results = process_batch(
+                batch,
+                project_root,
+                config,
+                guidelines,
+                guidelines_hash,
+                client,
+                rate_limiter,
+                cache,
+            )
+
+            all_results.extend(batch_results)
+            metrics.api_calls_made += 1
+
+            progress_state = update_progress(progress_state, batch_idx, batch_results)
+            save_progress(progress_state, progress_path)
+            save_cache(cache, cache_path)
 
     # Cleanup progress on completion
     if is_progress_complete(progress_state):
         cleanup_progress(progress_path)
 
-    # Update cache hash
-    cache.claude_md_hash = guidelines_hash
-    save_cache(cache, cache_path)
+    # Cache is already saved after each batch - no need to save again here
+    # The cache.claude_md_hash is already set correctly
 
-    return all_results
+    metrics.finish()
+    return all_results, metrics
 
 
 def collect_files_for_mode(
-    project_root: Path,
-    config: Config,
-    mode: str,
-    base_branch: Optional[str]
+    project_root: Path, config: Config, mode: str, base_branch: Optional[str]
 ) -> list[Path]:
     """Collect files based on mode.
 
@@ -240,10 +232,7 @@ def collect_files_for_mode(
 
 
 def filter_cached_files(
-    files: list[Path],
-    cache: Cache,
-    project_root: Path,
-    guidelines_hash: str
+    files: list[Path], cache: Cache, project_root: Path, guidelines_hash: str
 ) -> list[Path]:
     """Filter out files that are cached and valid.
 
@@ -282,11 +271,7 @@ def filter_cached_files(
     return needs_check
 
 
-def get_cached_results(
-    files: list[Path],
-    cache: Cache,
-    project_root: Path
-) -> list[dict[str, Any]]:
+def get_cached_results(files: list[Path], cache: Cache, project_root: Path) -> list[dict[str, Any]]:
     """Get results from cache for files.
 
     Args:
@@ -304,18 +289,12 @@ def get_cached_results(
 
         if rel_path in cache.entries:
             entry = cache.entries[rel_path]
-            results.append({
-                "file": rel_path,
-                "violations": entry.violations
-            })
+            results.append({"file": rel_path, "violations": entry.violations})
 
     return results
 
 
-def init_or_load_progress(
-    progress_path: Path,
-    total_batches: int
-) -> ProgressState:
+def init_or_load_progress(progress_path: Path, total_batches: int) -> ProgressState:
     """Initialize or load progress state.
 
     Args:

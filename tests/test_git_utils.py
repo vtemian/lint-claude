@@ -1,12 +1,11 @@
 import tempfile
 from pathlib import Path
 import subprocess
-import pytest
 from claude_lint.git_utils import (
     get_changed_files_from_branch,
     get_working_directory_files,
     get_staged_files,
-    is_git_repo
+    is_git_repo,
 )
 
 
@@ -21,23 +20,17 @@ def setup_git_repo(tmpdir: Path) -> Path:
         ["git", "config", "user.email", "test@example.com"],
         cwd=repo_dir,
         check=True,
-        capture_output=True
+        capture_output=True,
     )
     subprocess.run(
-        ["git", "config", "user.name", "Test User"],
-        cwd=repo_dir,
-        check=True,
-        capture_output=True
+        ["git", "config", "user.name", "Test User"], cwd=repo_dir, check=True, capture_output=True
     )
 
     # Create initial commit
     (repo_dir / "file1.py").write_text("print('hello')")
     subprocess.run(["git", "add", "."], cwd=repo_dir, check=True, capture_output=True)
     subprocess.run(
-        ["git", "commit", "-m", "initial"],
-        cwd=repo_dir,
-        check=True,
-        capture_output=True
+        ["git", "commit", "-m", "initial"], cwd=repo_dir, check=True, capture_output=True
     )
 
     return repo_dir
@@ -63,10 +56,7 @@ def test_get_changed_files_from_branch():
         (repo_dir / "file2.py").write_text("print('world')")
         subprocess.run(["git", "add", "."], cwd=repo_dir, check=True, capture_output=True)
         subprocess.run(
-            ["git", "commit", "-m", "add file2"],
-            cwd=repo_dir,
-            check=True,
-            capture_output=True
+            ["git", "commit", "-m", "add file2"], cwd=repo_dir, check=True, capture_output=True
         )
 
         # Get files changed from HEAD~1

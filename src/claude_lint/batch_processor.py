@@ -24,7 +24,7 @@ def process_batch(
     guidelines_hash: str,
     client: Anthropic,
     rate_limiter: RateLimiter,
-    cache: Cache
+    cache: Cache,
 ) -> list[dict[str, Any]]:
     """Process a single batch of files.
 
@@ -61,9 +61,7 @@ def process_batch(
     # Make rate-limited API call with retry
     def api_call() -> str:
         rate_limiter.acquire()
-        response_text, _ = analyze_files_with_client(
-            client, guidelines, prompt, model=config.model
-        )
+        response_text, _ = analyze_files_with_client(client, guidelines, prompt, model=config.model)
         return response_text
 
     response = retry_with_backoff(api_call)
@@ -82,26 +80,24 @@ def process_batch(
                 file_hash=file_hash,
                 claude_md_hash=guidelines_hash,
                 violations=result["violations"],
-                timestamp=int(file_path.stat().st_mtime)
+                timestamp=int(file_path.stat().st_mtime),
             )
         except FileNotFoundError as e:
             # File was deleted between analysis and caching
             logger.debug(
-                f"File {result['file']} not found during cache update, "
-                f"likely deleted: {e}"
+                f"File {result['file']} not found during cache update, " f"likely deleted: {e}"
             )
         except (PermissionError, OSError) as e:
             # Permission or filesystem error
             logger.warning(
-                f"Failed to update cache for {result['file']}: "
-                f"{type(e).__name__}: {e}"
+                f"Failed to update cache for {result['file']}: " f"{type(e).__name__}: {e}"
             )
         except Exception as e:
             # Unexpected error - log with full traceback
             logger.error(
                 f"Unexpected error updating cache for {result['file']}: "
                 f"{type(e).__name__}: {e}",
-                exc_info=True
+                exc_info=True,
             )
 
     return batch_results_dict

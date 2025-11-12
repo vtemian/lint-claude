@@ -16,11 +16,7 @@ def test_retry_success_on_first_attempt():
 
 def test_retry_success_after_failures():
     """Test function succeeds after some failures."""
-    mock_func = Mock(side_effect=[
-        Exception("fail1"),
-        Exception("fail2"),
-        "success"
-    ])
+    mock_func = Mock(side_effect=[Exception("fail1"), Exception("fail2"), "success"])
 
     result = retry_with_backoff(mock_func, max_retries=3, initial_delay=0.01)
 
@@ -119,6 +115,7 @@ def test_retry_uses_jitter():
 
     # Monkey-patch time.sleep to capture delays
     original_sleep = time.sleep
+
     def mock_sleep(duration):
         sleep_times.append(duration)
         # Don't actually sleep in test
@@ -135,14 +132,16 @@ def test_retry_uses_jitter():
     # First check: no delay should be exactly the base delay (would indicate no jitter)
     base_delays = [1.0, 2.0, 4.0]
     for i, delay in enumerate(sleep_times):
-        assert delay != base_delays[i], \
-            f"Delay {i} is exactly {base_delays[i]} - no jitter applied!"
+        assert (
+            delay != base_delays[i]
+        ), f"Delay {i} is exactly {base_delays[i]} - no jitter applied!"
 
     # Second check: delays should be within jitter range
     # Base: 1.0, 2.0, 4.0 but with ±50% jitter
     for i, delay in enumerate(sleep_times):
-        base_delay = 1.0 * (2.0 ** i)
+        base_delay = 1.0 * (2.0**i)
         min_delay = base_delay * 0.5
         max_delay = base_delay * 1.5
-        assert min_delay <= delay <= max_delay, \
-            f"Delay {delay} not in range [{min_delay}, {max_delay}]"
+        assert (
+            min_delay <= delay <= max_delay
+        ), f"Delay {delay} not in range [{min_delay}, {max_delay}]"

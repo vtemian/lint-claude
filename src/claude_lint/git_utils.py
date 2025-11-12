@@ -22,7 +22,7 @@ def is_git_repo(path: Path) -> bool:
             check=True,
             capture_output=True,
             text=True,
-            timeout=GIT_TIMEOUT
+            timeout=GIT_TIMEOUT,
         )
         return True
     except (subprocess.CalledProcessError, FileNotFoundError, subprocess.TimeoutExpired):
@@ -49,7 +49,7 @@ def get_changed_files_from_branch(repo_path: Path, base_branch: str) -> list[str
             check=True,
             capture_output=True,
             text=True,
-            timeout=GIT_TIMEOUT
+            timeout=GIT_TIMEOUT,
         )
     except subprocess.TimeoutExpired as e:
         raise RuntimeError(f"Git command timed out after {GIT_TIMEOUT}s") from e
@@ -78,7 +78,7 @@ def get_working_directory_files(repo_path: Path) -> list[str]:
             check=True,
             capture_output=True,
             text=True,
-            timeout=GIT_TIMEOUT
+            timeout=GIT_TIMEOUT,
         )
         modified = [f.strip() for f in result.stdout.split("\n") if f.strip()]
 
@@ -89,7 +89,7 @@ def get_working_directory_files(repo_path: Path) -> list[str]:
             check=True,
             capture_output=True,
             text=True,
-            timeout=GIT_TIMEOUT
+            timeout=GIT_TIMEOUT,
         )
         untracked = [f.strip() for f in result.stdout.split("\n") if f.strip()]
     except subprocess.TimeoutExpired as e:
@@ -117,7 +117,7 @@ def get_staged_files(repo_path: Path) -> list[str]:
             check=True,
             capture_output=True,
             text=True,
-            timeout=GIT_TIMEOUT
+            timeout=GIT_TIMEOUT,
         )
     except subprocess.TimeoutExpired as e:
         raise RuntimeError(f"Git command timed out after {GIT_TIMEOUT}s") from e

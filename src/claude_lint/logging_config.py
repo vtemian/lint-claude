@@ -30,9 +30,7 @@ def setup_logging(verbose: bool = False, quiet: bool = False) -> None:
     handler.setLevel(level)
 
     # Create formatter
-    formatter = logging.Formatter(
-        "%(levelname)s: %(message)s"
-    )
+    formatter = logging.Formatter("%(levelname)s: %(message)s")
     handler.setFormatter(formatter)
 
     logger.addHandler(handler)

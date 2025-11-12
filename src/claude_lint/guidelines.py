@@ -30,9 +30,7 @@ def read_claude_md(project_root: Path, fallback_home: Optional[Path] = None) -> 
     if home_claude_md.exists():
         return home_claude_md.read_text()
 
-    raise FileNotFoundError(
-        f"CLAUDE.md not found in {project_root} or {fallback_home}"
-    )
+    raise FileNotFoundError(f"CLAUDE.md not found in {project_root} or {fallback_home}")
 
 
 def get_claude_md_hash(content: str) -> str:

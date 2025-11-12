@@ -66,8 +66,8 @@ def filter_files_by_list(root_path: Path, file_list: list[str], config: Config) 
             # PurePath.match() handles ** patterns correctly for nested paths
             # but requires at least one directory level for ** patterns
             matches_include = any(
-                PurePath(str(relative)).match(pattern) or
-                (pattern.startswith("**/") and PurePath(str(relative)).match(pattern[3:]))
+                PurePath(str(relative)).match(pattern)
+                or (pattern.startswith("**/") and PurePath(str(relative)).match(pattern[3:]))
                 for pattern in config.include
             )
 
@@ -90,9 +90,9 @@ def compute_file_hash(file_path: Path) -> str:
     hash_obj = hashlib.sha256()
     try:
         # Try reading as text first
-        with open(file_path, 'rb') as f:
+        with open(file_path, "rb") as f:
             # Read in chunks to handle large files efficiently
-            for chunk in iter(lambda: f.read(65536), b''):
+            for chunk in iter(lambda: f.read(65536), b""):
                 hash_obj.update(chunk)
     except (OSError, IOError) as e:
         # Handle file read errors

@@ -1,15 +1,10 @@
-from pathlib import Path
-import pytest
 from claude_lint.processor import create_batches, parse_response, build_xml_prompt
 
 
 def test_build_xml_prompt():
     """Test building XML prompt for Claude API."""
     claude_md_content = "# Guidelines\n\nFollow TDD."
-    files = {
-        "src/main.py": "def main():\n    pass",
-        "src/utils.py": "def helper():\n    return 42"
-    }
+    files = {"src/main.py": "def main():\n    pass", "src/utils.py": "def helper():\n    return 42"}
 
     prompt = build_xml_prompt(claude_md_content, files)
 
@@ -28,10 +23,7 @@ def test_build_xml_prompt():
 def test_build_xml_prompt_escapes_special_characters():
     """Test that special XML characters are properly escaped."""
     claude_md_content = "Use <template> & avoid >>>"
-    files = {
-        'path/with"quote.py': 'x = 5 < 10 & y > 3',
-        "normal.py": "return a & b"
-    }
+    files = {'path/with"quote.py': "x = 5 < 10 & y > 3", "normal.py": "return a & b"}
 
     prompt = build_xml_prompt(claude_md_content, files)
 
@@ -39,14 +31,14 @@ def test_build_xml_prompt_escapes_special_characters():
     assert "Use &lt;template&gt; &amp; avoid &gt;&gt;&gt;" in prompt
 
     # Check that file paths with quotes are escaped
-    assert 'path/with&quot;quote.py' in prompt
+    assert "path/with&quot;quote.py" in prompt
 
     # Check that file content is escaped
     assert "x = 5 &lt; 10 &amp; y &gt; 3" in prompt
     assert "return a &amp; b" in prompt
 
     # Ensure no unescaped special characters in file content
-    assert 'x = 5 < 10 & y > 3' not in prompt
+    assert "x = 5 < 10 & y > 3" not in prompt
 
 
 def test_batch_files():

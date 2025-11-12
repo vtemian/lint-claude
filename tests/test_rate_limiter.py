@@ -1,7 +1,6 @@
 """Tests for rate limiting functionality."""
 import time
 import threading
-import pytest
 from claude_lint.rate_limiter import RateLimiter
 
 
@@ -65,8 +64,8 @@ def test_config_has_rate_limit_fields():
     from claude_lint.config import get_default_config
 
     config = get_default_config()
-    assert hasattr(config, 'api_rate_limit')
-    assert hasattr(config, 'api_rate_window_seconds')
+    assert hasattr(config, "api_rate_limit")
+    assert hasattr(config, "api_rate_window_seconds")
     assert config.api_rate_limit == 4  # Conservative default
     assert config.api_rate_window_seconds == 1.0
 
@@ -107,6 +106,7 @@ def test_try_acquire_non_blocking():
 
     # Wait for window to expire
     import time
+
     time.sleep(1.1)
 
     # Should succeed again

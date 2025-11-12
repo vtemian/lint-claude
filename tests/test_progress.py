@@ -1,9 +1,7 @@
-import json
 import tempfile
 from pathlib import Path
 import pytest
 from claude_lint.progress import (
-    ProgressState,
     create_progress_state,
     update_progress,
     save_progress,
@@ -11,7 +9,7 @@ from claude_lint.progress import (
     get_remaining_batch_indices,
     is_progress_complete,
     get_progress_percentage,
-    cleanup_progress
+    cleanup_progress,
 )
 
 

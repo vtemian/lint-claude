@@ -1,7 +1,5 @@
-import json
 import tempfile
 from pathlib import Path
-import pytest
 from claude_lint.cache import Cache, CacheEntry, load_cache, save_cache
 
 
@@ -11,7 +9,7 @@ def test_cache_entry_creation():
         file_hash="abc123",
         claude_md_hash="def456",
         violations=[{"type": "error", "message": "missing docstring", "line": None}],
-        timestamp=1234567890
+        timestamp=1234567890,
     )
 
     assert entry.file_hash == "abc123"
@@ -43,9 +41,9 @@ def test_save_and_load_cache():
                     file_hash="filehash1",
                     claude_md_hash="hash123",
                     violations=[{"type": "error", "message": "error1", "line": None}],
-                    timestamp=1234567890
+                    timestamp=1234567890,
                 )
-            }
+            },
         )
 
         # Save
@@ -68,9 +66,9 @@ def test_cache_invalidation_on_claude_md_change():
                 file_hash="filehash1",
                 claude_md_hash="old_hash",
                 violations=[],
-                timestamp=1234567890
+                timestamp=1234567890,
             )
-        }
+        },
     )
 
     # Check if entry is valid with new CLAUDE.md hash
@@ -90,14 +88,12 @@ def test_cache_handles_non_ascii_content(tmp_path):
             "café.py": CacheEntry(
                 file_hash="abc123",
                 claude_md_hash="hash123",
-                violations=[{
-                    "type": "style",
-                    "message": "Use café naming convention ☕",
-                    "line": 1
-                }],
-                timestamp=1234567890
+                violations=[
+                    {"type": "style", "message": "Use café naming convention ☕", "line": 1}
+                ],
+                timestamp=1234567890,
             )
-        }
+        },
     )
 
     cache_path = tmp_path / ".cache.json"

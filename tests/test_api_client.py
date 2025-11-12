@@ -1,6 +1,5 @@
 from unittest.mock import Mock, patch, MagicMock
 import pytest
-from anthropic import APIError
 from claude_lint.api_client import analyze_files, get_usage_stats
 
 
@@ -14,13 +13,11 @@ def test_analyze_with_caching(mock_anthropic):
 
     # Make request
     response_text, response_obj = analyze_files(
-        api_key="test-key",
-        guidelines="# Guidelines",
-        prompt="Check these files"
+        api_key="test-key", guidelines="# Guidelines", prompt="Check these files"
     )
 
-    # Verify API client was initialized
-    mock_anthropic.assert_called_once_with(api_key="test-key")
+    # Verify API client was initialized with timeout
+    mock_anthropic.assert_called_once_with(api_key="test-key", timeout=60.0)
 
     # Verify caching was used
     call_args = mock_anthropic.return_value.messages.create.call_args
@@ -54,14 +51,12 @@ def test_get_usage_stats(mock_anthropic):
         input_tokens=100,
         output_tokens=50,
         cache_creation_input_tokens=200,
-        cache_read_input_tokens=0
+        cache_read_input_tokens=0,
     )
     mock_anthropic.return_value.messages.create.return_value = mock_response
 
     response_text, response_obj = analyze_files(
-        api_key="test-key",
-        guidelines="# Guidelines",
-        prompt="Check files"
+        api_key="test-key", guidelines="# Guidelines", prompt="Check files"
     )
 
     stats = get_usage_stats(response_obj)
@@ -72,7 +67,7 @@ def test_get_usage_stats(mock_anthropic):
     assert stats["cache_read_tokens"] == 0
 
 
-@patch('claude_lint.api_client.Anthropic')
+@patch("claude_lint.api_client.Anthropic")
 def test_analyze_files_does_not_catch_keyboard_interrupt(mock_anthropic):
     """Test that KeyboardInterrupt is not caught."""
     mock_client = MagicMock()
@@ -96,7 +91,7 @@ def test_analyze_files_with_custom_model(mock_anthropic):
         api_key="test-key",
         guidelines="# Guidelines",
         prompt="Check these files",
-        model="claude-opus-4-5-20250929"
+        model="claude-opus-4-5-20250929",
     )
 
     # Verify custom model was used

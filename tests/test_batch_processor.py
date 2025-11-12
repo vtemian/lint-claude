@@ -3,7 +3,6 @@ import logging
 import tempfile
 from pathlib import Path
 from unittest.mock import Mock, MagicMock, patch
-import pytest
 from claude_lint.batch_processor import process_batch
 from claude_lint.cache import Cache
 from claude_lint.config import Config
@@ -18,12 +17,7 @@ def test_process_batch_success():
         (tmpdir / "file1.py").write_text("code")
 
         batch = [tmpdir / "file1.py"]
-        config = Config(
-            include=["**/*.py"],
-            exclude=[],
-            batch_size=10,
-            api_key="test"
-        )
+        config = Config(include=["**/*.py"], exclude=[], batch_size=10, api_key="test")
         cache = Cache(claude_md_hash="hash", entries={})
         rate_limiter = RateLimiter(max_requests=10, window_seconds=1.0)
 
@@ -31,15 +25,14 @@ def test_process_batch_success():
         mock_response = MagicMock()
         mock_response.text = "response"
 
-        with patch('claude_lint.batch_processor.analyze_files_with_client') as mock_api:
+        with patch("claude_lint.batch_processor.analyze_files_with_client") as mock_api:
             mock_api.return_value = (
                 '{"results": [{"file": "file1.py", "violations": []}]}',
-                mock_response
+                mock_response,
             )
 
             results = process_batch(
-                batch, tmpdir, config, "guidelines", "hash",
-                client, rate_limiter, cache
+                batch, tmpdir, config, "guidelines", "hash", client, rate_limiter, cache
             )
 
             assert len(results) == 1
@@ -62,14 +55,13 @@ def test_process_batch_empty_after_filtering():
             exclude=[],
             batch_size=10,
             max_file_size_mb=0.5,  # 500KB limit
-            api_key="test"
+            api_key="test",
         )
         cache = Cache(claude_md_hash="hash", entries={})
         rate_limiter = RateLimiter(max_requests=10, window_seconds=1.0)
 
         results = process_batch(
-            batch, tmpdir, config, "guidelines", "hash",
-            MagicMock(), rate_limiter, cache
+            batch, tmpdir, config, "guidelines", "hash", MagicMock(), rate_limiter, cache
         )
 
         # Should return empty - no API call made
@@ -82,24 +74,17 @@ def test_process_batch_logs_cache_update_failures(tmp_path, caplog):
     test_file = tmp_path / "test.py"
     test_file.write_text("print('test')")
 
-    config = Config(
-        include=["**/*.py"],
-        exclude=[],
-        batch_size=10
-    )
+    config = Config(include=["**/*.py"], exclude=[], batch_size=10)
 
     cache = Cache(claude_md_hash="test", entries={})
     rate_limiter = RateLimiter(max_requests=10, window_seconds=1.0)
     mock_client = Mock()
 
-    with patch('claude_lint.batch_processor.analyze_files_with_client') as mock_api:
-        mock_api.return_value = (
-            '{"results": [{"file": "test.py", "violations": []}]}',
-            Mock()
-        )
+    with patch("claude_lint.batch_processor.analyze_files_with_client") as mock_api:
+        mock_api.return_value = ('{"results": [{"file": "test.py", "violations": []}]}', Mock())
 
         # Make compute_file_hash fail
-        with patch('claude_lint.batch_processor.compute_file_hash') as mock_hash:
+        with patch("claude_lint.batch_processor.compute_file_hash") as mock_hash:
             mock_hash.side_effect = PermissionError("Access denied")
 
             with caplog.at_level(logging.WARNING):
@@ -111,7 +96,7 @@ def test_process_batch_logs_cache_update_failures(tmp_path, caplog):
                     "hash123",
                     mock_client,
                     rate_limiter,
-                    cache
+                    cache,
                 )
 
     # Should still return results

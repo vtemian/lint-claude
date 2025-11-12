@@ -23,10 +23,10 @@ def build_xml_prompt(claude_md_content: str, files: dict[str, str]) -> str:
     # Build files XML using list and join for efficiency
     files_xml_parts = []
     for file_path, content in files.items():
-        escaped_path = saxutils.escape(file_path, {'"': '&quot;'})
+        escaped_path = saxutils.escape(file_path, {'"': "&quot;"})
         escaped_content = saxutils.escape(content)
         files_xml_parts.append(f'  <file path="{escaped_path}">\n{escaped_content}\n  </file>\n')
-    files_xml = ''.join(files_xml_parts)
+    files_xml = "".join(files_xml_parts)
 
     # Escape claude_md_content for XML
     escaped_claude_md = saxutils.escape(claude_md_content)
@@ -78,7 +78,7 @@ def create_batches(items: list[Any], batch_size: int) -> list[list[Any]]:
     """
     batches = []
     for i in range(0, len(items), batch_size):
-        batches.append(items[i:i + batch_size])
+        batches.append(items[i : i + batch_size])
     return batches
 
 

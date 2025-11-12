@@ -20,10 +20,7 @@ def create_client(api_key: str, timeout: float = 60.0) -> Anthropic:
 
 
 def analyze_files_with_client(
-    client: Anthropic,
-    guidelines: str,
-    prompt: str,
-    model: str = "claude-sonnet-4-5-20250929"
+    client: Anthropic, guidelines: str, prompt: str, model: str = "claude-sonnet-4-5-20250929"
 ) -> tuple[str, Message]:
     """Analyze files using existing Claude API client.
 
@@ -51,19 +48,8 @@ def analyze_files_with_client(
         response = client.messages.create(
             model=model,
             max_tokens=4096,
-            system=[
-                {
-                    "type": "text",
-                    "text": guidelines,
-                    "cache_control": {"type": "ephemeral"}
-                }
-            ],
-            messages=[
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ]
+            system=[{"type": "text", "text": guidelines, "cache_control": {"type": "ephemeral"}}],
+            messages=[{"role": "user", "content": prompt}],
         )
     except APITimeoutError as e:
         logger.error(f"API request timed out: {e}")
@@ -87,18 +73,13 @@ def analyze_files_with_client(
 
     # Extract text from first content block (must be TextBlock)
     first_block = response.content[0]
-    if not hasattr(first_block, 'text'):
-        raise ValueError(
-            f"API returned non-text content (type: {type(first_block).__name__})"
-        )
+    if not hasattr(first_block, "text"):
+        raise ValueError(f"API returned non-text content (type: {type(first_block).__name__})")
     return first_block.text, response
 
 
 def analyze_files(
-    api_key: str,
-    guidelines: str,
-    prompt: str,
-    model: str = "claude-sonnet-4-5-20250929"
+    api_key: str, guidelines: str, prompt: str, model: str = "claude-sonnet-4-5-20250929"
 ) -> tuple[str, Message]:
     """Analyze files using Claude API with cached guidelines.
 
@@ -136,5 +117,5 @@ def get_usage_stats(response: Message) -> dict[str, int]:
         "input_tokens": usage.input_tokens,
         "output_tokens": usage.output_tokens,
         "cache_creation_tokens": getattr(usage, "cache_creation_input_tokens", 0),
-        "cache_read_tokens": getattr(usage, "cache_read_input_tokens", 0)
+        "cache_read_tokens": getattr(usage, "cache_read_input_tokens", 0),
     }

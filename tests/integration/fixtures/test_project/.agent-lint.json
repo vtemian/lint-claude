@@ -1,0 +1,5 @@
+{
+  "include": ["**/*.py"],
+  "exclude": ["venv/**"],
+  "batch_size": 5
+}

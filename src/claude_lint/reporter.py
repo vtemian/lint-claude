@@ -80,9 +80,9 @@ def format_json_report(results: list[dict[str, Any]], metrics: AnalysisMetrics) 
             "total_files": total_files,
             "files_with_violations": files_with_violations,
             "clean_files": total_files - files_with_violations,
-            "total_violations": total_violations
+            "total_violations": total_violations,
         },
-        "metrics": metrics.to_dict()
+        "metrics": metrics.to_dict(),
     }
 
     return json.dumps(report, indent=2)
@@ -118,5 +118,5 @@ def get_summary(results: list[FileResult]) -> dict[str, int]:
         "total_files": total_files,
         "files_with_violations": files_with_violations,
         "clean_files": total_files - files_with_violations,
-        "total_violations": total_violations
+        "total_violations": total_violations,
     }
