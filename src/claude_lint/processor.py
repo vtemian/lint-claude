@@ -106,7 +106,8 @@ def parse_response(response: str) -> list[FileResult]:
 
     try:
         data = json.loads(json_str)
-        return data.get("results", [])
+        results: list[FileResult] = data.get("results", [])
+        return results
     except json.JSONDecodeError as e:
         logger.error(f"Failed to parse JSON from response: {e}")
         return []

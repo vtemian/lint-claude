@@ -58,7 +58,7 @@ def process_batch(
     prompt = build_xml_prompt(guidelines, file_contents)
 
     # Make rate-limited API call with retry
-    def api_call():
+    def api_call() -> str:
         rate_limiter.acquire()
         response_text, _ = analyze_files_with_client(
             client, guidelines, prompt, model=config.model

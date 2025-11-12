@@ -1,14 +1,17 @@
 """Report formatting and output."""
 import json
+from typing import Any
 
 from claude_lint.types import FileResult
+from claude_lint.metrics import AnalysisMetrics
 
 
-def format_detailed_report(results: list[FileResult]) -> str:
+def format_detailed_report(results: list[dict[str, Any]], metrics: AnalysisMetrics) -> str:
     """Format results as detailed human-readable report.
 
     Args:
         results: List of file results with violations
+        metrics: Analysis metrics
 
     Returns:
         Formatted report string
@@ -42,14 +45,27 @@ def format_detailed_report(results: list[FileResult]) -> str:
             lines.append("   No violations")
             lines.append("")
 
+    # Add metrics section
+    lines.append("=" * 70)
+    lines.append("ANALYSIS METRICS")
+    lines.append("=" * 70)
+    lines.append(f"Elapsed time: {metrics.elapsed_seconds:.2f}s")
+    lines.append(f"Files collected: {metrics.total_files_collected}")
+    lines.append(f"Files from cache: {metrics.files_from_cache}")
+    lines.append(f"Files analyzed: {metrics.files_analyzed}")
+    lines.append(f"API calls made: {metrics.api_calls_made}")
+    lines.append(f"Cache hit rate: {metrics.cache_hit_rate:.1f}%")
+    lines.append("")
+
     return "\n".join(lines)
 
 
-def format_json_report(results: list[FileResult]) -> str:
+def format_json_report(results: list[dict[str, Any]], metrics: AnalysisMetrics) -> str:
     """Format results as JSON.
 
     Args:
         results: List of file results with violations
+        metrics: Analysis metrics
 
     Returns:
         JSON string
@@ -65,13 +81,14 @@ def format_json_report(results: list[FileResult]) -> str:
             "files_with_violations": files_with_violations,
             "clean_files": total_files - files_with_violations,
             "total_violations": total_violations
-        }
+        },
+        "metrics": metrics.to_dict()
     }
 
     return json.dumps(report, indent=2)
 
 
-def get_exit_code(results: list[FileResult]) -> int:
+def get_exit_code(results: list[dict[str, Any]]) -> int:
     """Get exit code based on results.
 
     Args:
