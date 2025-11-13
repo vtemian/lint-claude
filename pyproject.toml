@@ -1,6 +1,6 @@
 [project]
 name = "lint-claude"
-version = "0.3.1"
+version = "0.3.2"
 description = "Enforce your CLAUDE.md guidelines using Claude AI - intelligent linting for agent instructions"
 readme = "README.md"
 requires-python = ">=3.11"
