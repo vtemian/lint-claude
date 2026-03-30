@@ -2,7 +2,7 @@
 
 **Automatically enforce your CLAUDE.md guidelines using Claude AI**
 
-> Part of the [Harness Engineering](https://vtemian.com/post/harness-engineering/) approach — building systems that keep AI agents productive and aligned with your team's standards.
+> Part of the [Harness Engineering](https://blog.vtemian.com/post/harness-engineering/) approach — building systems that keep AI agents productive and aligned with your team's standards.
 
 [![PyPI version](https://badge.fury.io/py/lint-claude.svg)](https://badge.fury.io/py/lint-claude)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -564,7 +564,7 @@ The system prompt is fixed to ensure reliable output parsing. Customize behavior
 
 - Built with [Anthropic Claude API](https://www.anthropic.com/)
 - Inspired by [CLAUDE.md specification](https://github.com/anthropics/claude-code/blob/main/codebase_instructions.md)
-- Part of the [Harness Engineering](https://vtemian.com/post/harness-engineering/) approach to governing AI-assisted development
+- Part of the [Harness Engineering](https://blog.vtemian.com/post/harness-engineering/) approach to governing AI-assisted development
 
 ## Support
 
