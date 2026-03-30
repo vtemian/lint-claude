@@ -1,4 +1,5 @@
 """Git integration utilities."""
+
 import subprocess
 from pathlib import Path
 

@@ -1,4 +1,5 @@
 """Main orchestrator coordinating all components."""
+
 import os
 from pathlib import Path
 from typing import Any

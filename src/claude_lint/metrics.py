@@ -1,4 +1,5 @@
 """Metrics and telemetry tracking."""
+
 import time
 from dataclasses import dataclass, field
 

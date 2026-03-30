@@ -1,4 +1,5 @@
 """Batch processing and XML prompt generation."""
+
 import json
 import logging
 import re

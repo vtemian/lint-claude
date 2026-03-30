@@ -1,4 +1,5 @@
 """Command-line interface for claude-lint."""
+
 import json
 import sys
 from pathlib import Path
@@ -213,9 +214,7 @@ def _run_main(
         # Unexpected errors - log details in verbose mode
         logger = get_logger(__name__)
         logger.exception("Unexpected error during execution")
-        click.echo(
-            f"An unexpected error occurred: {e}\n" "Run with --verbose for details.", err=True
-        )
+        click.echo(f"An unexpected error occurred: {e}\nRun with --verbose for details.", err=True)
         sys.exit(2)
 
 

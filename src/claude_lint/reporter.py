@@ -1,4 +1,5 @@
 """Report formatting and output."""
+
 import json
 from typing import Any
 

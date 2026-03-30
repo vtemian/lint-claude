@@ -1,4 +1,5 @@
 """Tests for metrics tracking."""
+
 import time
 
 from claude_lint.metrics import AnalysisMetrics

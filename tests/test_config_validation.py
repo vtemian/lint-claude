@@ -1,4 +1,5 @@
 """Tests for config validation."""
+
 import pytest
 from claude_lint.config import Config
 from pydantic import ValidationError

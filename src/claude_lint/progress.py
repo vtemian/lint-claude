@@ -1,4 +1,5 @@
 """Progress tracking and resume capability."""
+
 import json
 from dataclasses import asdict, dataclass, field
 from pathlib import Path

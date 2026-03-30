@@ -2,7 +2,7 @@
 
 ## Overview
 
-Claude-lint is designed as a functional Python CLI that checks code compliance with CLAUDE.md guidelines using the Claude API.
+lint-claude is designed as a functional Python CLI that checks code compliance with CLAUDE.md guidelines using the Claude API.
 
 ## Design Principles
 

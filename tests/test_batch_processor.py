@@ -1,4 +1,5 @@
 """Tests for batch processing."""
+
 import logging
 import tempfile
 from pathlib import Path

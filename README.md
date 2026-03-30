@@ -2,6 +2,8 @@
 
 **Automatically enforce your CLAUDE.md guidelines using Claude AI**
 
+> Part of the [Harness Engineering](https://vtemian.com/post/harness-engineering/) approach — building systems that keep AI agents productive and aligned with your team's standards.
+
 [![PyPI version](https://badge.fury.io/py/lint-claude.svg)](https://badge.fury.io/py/lint-claude)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
@@ -134,11 +136,17 @@ uvx lint-claude --full --quiet
 
 # Verbose mode (detailed logging)
 uvx lint-claude --full --verbose
+
+# Save results to file
+uvx lint-claude --full --output report.txt
+
+# JSON output saved to file (JSON Lines format)
+uvx lint-claude --full --json --output report.jsonl
 ```
 
 ### Configuration
 
-Create `.lint-claude.json` in your project root:
+Create `.agent-lint.json` in your project root:
 
 ```json
 {
@@ -159,7 +167,7 @@ Create `.lint-claude.json` in your project root:
 | `include` | `["**/*.py", "**/*.js", "**/*.ts"]` | Glob patterns for files to check |
 | `exclude` | See below | Glob patterns to skip |
 | `batch_size` | `10` | Files per API request (1-100) |
-| `max_file_size_mb` | `10.0` | Skip files larger than this |
+| `max_file_size_mb` | `1.0` | Skip files larger than this |
 | `model` | `claude-sonnet-4-5-20250929` | Claude model to use |
 | `api_key` | (env var) | Override ANTHROPIC_API_KEY |
 | `api_timeout_seconds` | `300` | API request timeout |
@@ -198,7 +206,7 @@ jobs:
           fetch-depth: 0  # Need full history for diff mode
 
       - name: Lint CLAUDE.md
-        uses: vtemian/lint-claude@v0.3.1
+        uses: vtemian/lint-claude@v0.4.0
         with:
           mode: 'diff'
           base-branch: 'origin/main'
@@ -226,7 +234,7 @@ jobs:
 
 **Full project scan:**
 ```yaml
-- uses: vtemian/lint-claude@v0.3.1
+- uses: vtemian/lint-claude@v0.4.0
   with:
     mode: 'full'
 ```
@@ -235,7 +243,7 @@ jobs:
 ```yaml
 - name: Lint changed files
   id: lint
-  uses: vtemian/lint-claude@v0.3.1
+  uses: vtemian/lint-claude@v0.4.0
   with:
     mode: 'diff'
     fail-on-violations: 'false'
@@ -255,7 +263,7 @@ jobs:
 
 **Check staged files only:**
 ```yaml
-- uses: vtemian/lint-claude@v0.3.1
+- uses: vtemian/lint-claude@v0.4.0
   with:
     mode: 'staged'
 ```
@@ -328,9 +336,9 @@ repos:
 `lint-claude` is designed to be fast and cost-effective:
 
 - **Prompt Caching** - CLAUDE.md is cached by Claude's API, reducing costs by ~90%
-- **File Hash Cache** - Only re-checks modified files (`.lint-claude-cache.json`)
+- **File Hash Cache** - Only re-checks modified files (`.agent-lint-cache.json`)
 - **CLAUDE.md Hash** - Triggers full re-scan when guidelines change
-- **Resume Support** - Interrupted scans resume from last batch (`.lint-claude-progress.json`)
+- **Resume Support** - Interrupted scans resume from last batch (`.agent-lint-progress.json`)
 
 **Example:** Checking 100 files costs ~$0.50 on first run, then ~$0.05 for incremental checks.
 
@@ -404,11 +412,11 @@ $ uvx lint-claude --staged --json
 Use different Claude models for different needs:
 
 ```bash
-# Fast and cheap (Haiku)
-uvx lint-claude --full --model claude-haiku-20250301
+# Haiku - fast and cheap
+uvx lint-claude --full --model claude-haiku-4-5-20251001
 
-# More thorough (Opus)
-uvx lint-claude --full --model claude-opus-20250229
+# Opus - most thorough
+uvx lint-claude --full --model claude-opus-4-0-20250514
 
 # Default (Sonnet - best balance)
 uvx lint-claude --full --model claude-sonnet-4-5-20250929
@@ -428,7 +436,7 @@ uvx lint-claude --full --batch-size 50
 
 ```bash
 # Force re-check all files
-rm .lint-claude-cache.json
+rm .agent-lint-cache.json
 uvx lint-claude --full
 ```
 
@@ -446,7 +454,7 @@ If you hit rate limits, reduce RPM in config:
 
 ### Large Files Skipped
 
-Files larger than 10MB are skipped by default. To check larger files:
+Files larger than 1MB are skipped by default. To check larger files:
 
 ```json
 {
@@ -474,7 +482,7 @@ uvx lint-claude --full
 To start fresh:
 
 ```bash
-rm .lint-claude-progress.json
+rm .agent-lint-progress.json
 uvx lint-claude --full
 ```
 
@@ -546,7 +554,7 @@ No, it requires Claude API access. However, it caches aggressively to minimize A
 
 ### What models are supported?
 
-All Claude 3+ models: Haiku, Sonnet, Opus. Sonnet (default) offers the best balance of speed, cost, and accuracy.
+All Claude models: Haiku, Sonnet, Opus. Default is Sonnet — best balance of speed, cost, and accuracy.
 
 ### Can I customize the prompt?
 
@@ -556,6 +564,7 @@ The system prompt is fixed to ensure reliable output parsing. Customize behavior
 
 - Built with [Anthropic Claude API](https://www.anthropic.com/)
 - Inspired by [CLAUDE.md specification](https://github.com/anthropics/claude-code/blob/main/codebase_instructions.md)
+- Part of the [Harness Engineering](https://vtemian.com/post/harness-engineering/) approach to governing AI-assisted development
 
 ## Support
 

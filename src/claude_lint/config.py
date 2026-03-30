@@ -1,4 +1,5 @@
 """Configuration management for claude-lint."""
+
 import json
 from pathlib import Path
 

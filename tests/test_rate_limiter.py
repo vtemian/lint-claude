@@ -1,4 +1,5 @@
 """Tests for rate limiting functionality."""
+
 import threading
 import time
 

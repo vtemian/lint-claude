@@ -1,4 +1,5 @@
 """Tests for CLI exception handling."""
+
 from unittest.mock import patch
 
 from claude_lint.cli import main

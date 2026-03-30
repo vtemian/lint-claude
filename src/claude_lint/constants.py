@@ -11,8 +11,8 @@ API_MAX_TOKENS = 4096
 """Maximum tokens for Claude API responses.
 
 Value: 4096
-Rationale: Claude models support up to 4096 output tokens. For code analysis,
-responses rarely exceed 2000 tokens, so 4096 provides comfortable headroom.
+Rationale: Max output tokens for lint responses. Claude supports higher limits
+but 4096 is sufficient for linting output.
 """
 
 # Retry Settings

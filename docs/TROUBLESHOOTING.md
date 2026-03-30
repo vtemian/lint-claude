@@ -6,7 +6,7 @@
 
 **Error:** `ValueError: API key is required`
 
-**Solution:** Set the `ANTHROPIC_API_KEY` environment variable or add `api_key` to `.lint-claude.json`:
+**Solution:** Set the `ANTHROPIC_API_KEY` environment variable or add `api_key` to `.agent-lint.json`:
 
 ```bash
 export ANTHROPIC_API_KEY="sk-ant-..."
@@ -25,7 +25,7 @@ export ANTHROPIC_API_KEY="sk-ant-..."
 
 **Warning:** `File X is not valid UTF-8, trying latin-1`
 
-**Info:** Claude-lint tries UTF-8 first, falls back to latin-1. If both fail, the file is skipped.
+**Info:** lint-claude tries UTF-8 first, falls back to latin-1. If both fail, the file is skipped.
 
 **Solution:**
 - Check file encoding: `file -I <filename>`
@@ -54,7 +54,7 @@ export ANTHROPIC_API_KEY="sk-ant-..."
 rm .lint-claude-cache.json .lint-claude-progress.json
 ```
 
-Claude-lint will rebuild the cache on next run.
+lint-claude will rebuild the cache on next run.
 
 ### Pattern Matching Not Working
 

@@ -1,4 +1,5 @@
 """File reading with encoding fallback and size limits."""
+
 from pathlib import Path
 
 from claude_lint.logging_config import get_logger

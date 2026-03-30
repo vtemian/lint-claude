@@ -1,4 +1,5 @@
 """CLAUDE.md guidelines reader and hash tracker."""
+
 import hashlib
 from pathlib import Path
 

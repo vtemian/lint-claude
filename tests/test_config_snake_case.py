@@ -1,4 +1,5 @@
 """Tests for snake_case config support."""
+
 import json
 import tempfile
 from pathlib import Path

@@ -1,4 +1,5 @@
 """File collection with pattern matching."""
+
 import hashlib
 from pathlib import Path, PurePath
 

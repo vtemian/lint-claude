@@ -1,4 +1,5 @@
 """Type definitions for claude-lint."""
+
 from typing import TypedDict
 
 

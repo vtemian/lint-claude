@@ -1,4 +1,5 @@
 """Tests for configuration constants."""
+
 from claude_lint.constants import (
     API_MAX_TOKENS,
     MIN_API_KEY_LENGTH,

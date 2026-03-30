@@ -1,4 +1,5 @@
 """Batch processing logic."""
+
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -102,18 +103,15 @@ def process_batch(
         except FileNotFoundError as e:
             # File was deleted between analysis and caching
             logger.debug(
-                f"File {result['file']} not found during cache update, " f"likely deleted: {e}"
+                f"File {result['file']} not found during cache update, likely deleted: {e}"
             )
         except (PermissionError, OSError) as e:
             # Permission or filesystem error
-            logger.warning(
-                f"Failed to update cache for {result['file']}: " f"{type(e).__name__}: {e}"
-            )
+            logger.warning(f"Failed to update cache for {result['file']}: {type(e).__name__}: {e}")
         except Exception as e:
             # Unexpected error - log with full traceback
             logger.error(
-                f"Unexpected error updating cache for {result['file']}: "
-                f"{type(e).__name__}: {e}",
+                f"Unexpected error updating cache for {result['file']}: {type(e).__name__}: {e}",
                 exc_info=True,
             )
 

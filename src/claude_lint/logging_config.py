@@ -1,4 +1,5 @@
 """Logging configuration for claude-lint."""
+
 import logging
 import sys
 

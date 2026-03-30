@@ -1,4 +1,5 @@
 """Cache management for file analysis results."""
+
 import json
 from dataclasses import asdict, dataclass
 from pathlib import Path

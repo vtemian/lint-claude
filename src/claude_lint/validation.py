@@ -1,4 +1,5 @@
 """Input validation functions."""
+
 from pathlib import Path
 
 from claude_lint.constants import MIN_API_KEY_LENGTH
